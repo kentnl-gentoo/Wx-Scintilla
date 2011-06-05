@@ -23,7 +23,7 @@ provides:
     version: 0
   Wx::Scintilla:
     file: lib/Wx/Scintilla.pm
-    version: 0.01
+    version: 0.02
   Wx::ScintillaTextCtrl:
     file: lib/Wx/Scintilla.pm
     version: 0
@@ -34,4 +34,4 @@ resources:
   homepage: http://padre.perlide.org/
   license: http://dev.perl.org/licenses/
   repository: http://svn.perlide.org/padre/trunk/Wx-Scintilla/
-version: 0.01
+version: 0.02

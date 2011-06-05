@@ -3,10 +3,7 @@ Changes
 cpp/st_constants.cpp
 inc/Module/Build/Scintilla.pm
 lib/Wx/Scintilla.pm
-Makefile.PL
 MANIFEST			This list of files
-META.json
-META.yml
 padre_wx_scintilla.patch
 README
 Scintilla_README
@@ -171,3 +168,6 @@ wx_typemap
 wx_typemap.xsp
 XS/ScintillaTextCtrl.xsp
 XS/ScintillaTextEvent.xsp
+Makefile.PL
+META.yml
+META.json

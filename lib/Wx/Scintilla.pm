@@ -4,11 +4,11 @@ use Wx;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # Add Wx::Scintilla distribution directory to PATH on windows so that Wx can load it
 use File::ShareDir ();
-local $ENV{PATH} =  File::ShareDir::dist_dir('Wx-Scintilla') . ';' . $ENV{PATH} if ($^O eq 'MSWin32');
+local $ENV{PATH} = File::ShareDir::dist_dir('Wx-Scintilla') . ';' . $ENV{PATH} if ( $^O eq 'MSWin32' );
 
 # Load scintilla and ask Wx to boot it :)
 Wx::load_dll('scintilla');
@@ -24,12 +24,10 @@ package Wx::ScintillaTextCtrl; @ISA = qw(Wx::Control);
 
 package Wx::ScintillaTextEvent; @ISA = qw(Wx::CommandEvent);
 
+eval q{
 package Wx::Event;
 
 use strict;
-
-# !parser: sub { $_[0] =~ m/sub (EVT_\w+)/ }
-# !package: Wx::Event
 
 sub EVT_SCINTILLA_CHANGE($$$)            { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_CHANGE,            $_[2] ) }
 sub EVT_SCINTILLA_STYLENEEDED($$$)       { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_STYLENEEDED,       $_[2] ) }
@@ -57,6 +55,7 @@ sub EVT_SCINTILLA_ZOOM($$$)              { $_[0]->Connect( $_[1], -1, &Wx::wxEVT
 sub EVT_SCINTILLA_HOTSPOT_CLICK($$$)     { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_HOTSPOT_CLICK,     $_[2] ) }
 sub EVT_SCINTILLA_HOTSPOT_DCLICK($$$)    { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_HOTSPOT_DCLICK,    $_[2] ) }
 sub EVT_SCINTILLA_CALLTIP_CLICK($$$)     { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_CALLTIP_CLICK,     $_[2] ) }
+};
 
 1; # end of Wx::Scintilla
 
