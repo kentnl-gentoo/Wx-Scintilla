@@ -1,0 +1,61 @@
+{
+   "abstract" : "Perl wxWidgets XS bindings for Scintilla editor component",
+   "author" : [
+      "Ahmad M. Zawawi <ahmad.zawawi@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Wx-Scintilla",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::wxWidgets" : 0,
+            "ExtUtils::XSpp" : 0,
+            "File::ShareDir" : 0,
+            "Test::More" : 0,
+            "Wx" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      }
+   },
+   "provides" : {
+      "Wx::Event" : {
+         "file" : "lib/Wx/Scintilla.pm",
+         "version" : 0
+      },
+      "Wx::Scintilla" : {
+         "file" : "lib/Wx/Scintilla.pm",
+         "version" : "0.01"
+      },
+      "Wx::ScintillaTextCtrl" : {
+         "file" : "lib/Wx/Scintilla.pm",
+         "version" : 0
+      },
+      "Wx::ScintillaTextEvent" : {
+         "file" : "lib/Wx/Scintilla.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://padre.perlide.org/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://svn.perlide.org/padre/trunk/Wx-Scintilla/"
+      }
+   },
+   "version" : "0.01"
+}
