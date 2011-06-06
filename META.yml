@@ -16,10 +16,15 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
 name: Wx-Scintilla
+no_index:
+  package:
+    - Wx::ScintillaTextCtrl
+    - Wx::ScintillaTextEvent
+    - Wx::Event
 provides:
   Wx::Scintilla:
     file: lib/Wx/Scintilla.pm
-    version: 0.04
+    version: 0.041
   Wx::ScintillaTextCtrl:
     file: lib/Wx/Scintilla.pm
   Wx::ScintillaTextEvent:
@@ -28,4 +33,4 @@ resources:
   homepage: http://padre.perlide.org/
   license: http://dev.perl.org/licenses/
   repository: http://svn.perlide.org/padre/trunk/Wx-Scintilla/
-version: 0.04
+version: 0.041

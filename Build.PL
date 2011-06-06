@@ -59,12 +59,18 @@ my $builder = Module::Build::Scintilla->new(
 	],
 	create_makefile_pl => 'traditional',
 	meta_merge         => {
+		no_index => {
+			package => ['Wx::ScintillaTextCtrl', 'Wx::ScintillaTextEvent', 'Wx::Event'],
+		
+		},
 		resources => {
 			homepage   => 'http://padre.perlide.org/',
 			repository => 'http://svn.perlide.org/padre/trunk/Wx-Scintilla/',
 		}
 	},
 	dist_abstract => 'Fresh Perl wxWidgets XS bindings for Scintilla editor component',
+	    package   => [ 'My::Module::Secret' ],
+
 	verbose       => 1,
 );
 
