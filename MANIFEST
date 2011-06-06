@@ -8,7 +8,7 @@ padre_wx_scintilla.patch
 README
 Scintilla.xs
 Scintilla_README
-share/30_editor.pl
+share/editor.pl
 t/01_load.t
 t/02_inheritance.t
 t/lib/Tests_Helper.pm
@@ -171,4 +171,3 @@ XS/ScintillaTextCtrl.xsp
 XS/ScintillaTextEvent.xsp
 Makefile.PL
 META.yml
-META.json

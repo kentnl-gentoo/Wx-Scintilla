@@ -1,18 +1,31 @@
 package Wx::Scintilla;
 
-use Wx;
+
 use strict;
 use warnings;
+use Wx;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # Add Wx::Scintilla distribution directory to PATH on windows so that Wx can load it
-use File::ShareDir ();
-local $ENV{PATH} = File::ShareDir::dist_dir('Wx-Scintilla') . ';' . $ENV{PATH} if ( $^O eq 'MSWin32' );
+my $wx_scintilla_path;
+if ( $ENV{HARNESS_ACTIVE} ) {
+	$wx_scintilla_path = './blib/arch/auto/Wx/Scintilla/';
+} else {
+	eval { require File::ShareDir; $wx_scintilla_path = File::ShareDir::dist_dir('Wx-Scintilla'); 1; };
+	if ($@) {
 
-# Load scintilla and ask Wx to boot it :)
+		# fallback
+		$wx_scintilla_path = './blib/arch/auto/Wx/Scintilla/';
+	}
+}
+$ENV{PATH} = $wx_scintilla_path . ';' . $ENV{PATH} if ( $^O eq 'MSWin32' );
+
+# Load scintilla's DLL through Wx and ask XSLoader to load it
+# NOTE: Do not use Wx::boot since it is buggy and causes test suite to fail while upgrading
 Wx::load_dll('scintilla');
-Wx::wx_boot( 'Wx::Scintilla', $VERSION );
+require XSLoader;
+XSLoader::load 'Wx::Scintilla', $VERSION;
 
 #
 # properly setup inheritance tree
@@ -66,10 +79,91 @@ __END__
 
 Wx::Scintilla - Fresh Perl wxWidgets XS bindings for Scintilla editor component
 
-=head SYNOPSIS
+=head1 SYNOPSIS
 
-# is a replacement of Wx::StyledTextCtrl
-use Wx::ScintillaTextCtrl;
+	#----> My first scintilla Wx editor :)
+	package My::Scintilla::Editor;
+
+	use strict;
+	use warnings;
+
+	# Load Wx::Scintilla
+	use Wx::Scintilla ();    # replaces use Wx::STC
+	use base 'Wx::ScintillaTextCtrl';    # replaces Wx::StyledTextCtrl
+
+	use Wx qw(:everything);
+	use Wx::Event;
+
+	# Override the constructor to Enable Perl support in the editor
+	sub new {
+		my ( $class, $parent ) = @_;
+		my $self = $class->SUPER::new( $parent, -1, [ -1, -1 ], [ 750, 700 ] );
+
+		# Set the font
+		my $font = Wx::Font->new( 10, wxTELETYPE, wxNORMAL, wxNORMAL );
+		$self->SetFont($font);
+		$self->StyleSetFont( wxSTC_STYLE_DEFAULT, $font );
+		$self->StyleClearAll();
+
+		# Set the various Perl lexer colors
+		$self->StyleSetForeground( 0,  Wx::Colour->new( 0x00, 0x00, 0x7f ) );
+		$self->StyleSetForeground( 1,  Wx::Colour->new( 0xff, 0x00, 0x00 ) );
+		$self->StyleSetForeground( 2,  Wx::Colour->new( 0x00, 0x7f, 0x00 ) );
+		$self->StyleSetForeground( 3,  Wx::Colour->new( 0x7f, 0x7f, 0x7f ) );
+		$self->StyleSetForeground( 4,  Wx::Colour->new( 0x00, 0x7f, 0x7f ) );
+		$self->StyleSetForeground( 5,  Wx::Colour->new( 0x00, 0x00, 0x7f ) );
+		$self->StyleSetForeground( 6,  Wx::Colour->new( 0xff, 0x7f, 0x00 ) );
+		$self->StyleSetForeground( 7,  Wx::Colour->new( 0x7f, 0x00, 0x7f ) );
+		$self->StyleSetForeground( 8,  Wx::Colour->new( 0x00, 0x00, 0x00 ) );
+		$self->StyleSetForeground( 9,  Wx::Colour->new( 0x7f, 0x7f, 0x7f ) );
+		$self->StyleSetForeground( 10, Wx::Colour->new( 0x00, 0x00, 0x7f ) );
+		$self->StyleSetForeground( 11, Wx::Colour->new( 0x00, 0x00, 0xff ) );
+		$self->StyleSetForeground( 12, Wx::Colour->new( 0x7f, 0x00, 0x7f ) );
+		$self->StyleSetForeground( 13, Wx::Colour->new( 0x40, 0x80, 0xff ) );
+		$self->StyleSetForeground( 17, Wx::Colour->new( 0xff, 0x00, 0x7f ) );
+		$self->StyleSetForeground( 18, Wx::Colour->new( 0x7f, 0x7f, 0x00 ) );
+		$self->StyleSetBold( 12, 1 );
+		$self->StyleSetSpec( wxSTC_H_TAG, "fore:#0000ff" );
+
+		# set the lexer to Perl 5
+		$self->SetLexer(wxSTC_LEX_PERL);
+
+		return $self;
+	}
+
+	#----> DEMO EDITOR APPLICATION
+
+	# First, define an application object class to encapsulate the application itself
+	package DemoEditorApp;
+
+	use strict;
+	use warnings;
+	use Wx;
+	use base 'Wx::App';
+
+	# We must override OnInit to build the window
+	sub OnInit {
+		my $self = shift;
+
+		my $frame = Wx::Frame->new(
+		undef,                           # no parent window
+		-1,                              # no window id
+		'My First Scintilla Editor!',    # Window title
+		);
+
+		my $editor = My::Scintilla::Editor->new(
+		$frame,                          # Parent window
+		);
+
+		$frame->Show(1);
+		return 1;
+	}
+
+	# Create the application object, and pass control to it.
+	package main;
+	my $app = DemoEditorApp->new;
+	$app->MainLoop;
+
 
 =head1 DESCRIPTION
 
@@ -144,13 +238,23 @@ Robin Dunn L<http://alldunn.com/robin/> for the excellent scintilla
 contribution that he made to wxWidgets. This work is based on his codebase.
 Thanks!
 
-=head1 SEE ALSO
+=head1 SUPPORT
 
-wxStyledTextCtrl Documentation L<http://www.yellowbrain.com/stc/index.html>
+Bugs should always be submitted via the CPAN bug tracker
+
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Wx-Scintilla>
+
+For other issues, contact the maintainer.
 
 =head1 AUTHOR
 
 Ahmad M. Zawawi <ahmad.zawawi@gmail.com>
+
+=head1 SEE ALSO
+
+wxStyledTextCtrl Documentation L<http://www.yellowbrain.com/stc/index.html>
+
+Scintilla edit control for Win32::GUI L<Win32::GUI::Scintilla>
 
 =head1 COPYRIGHT
 
