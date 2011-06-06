@@ -6,6 +6,7 @@ lib/Wx/Scintilla.pm
 MANIFEST			This list of files
 padre_wx_scintilla.patch
 README
+Scintilla.xs
 Scintilla_README
 share/30_editor.pl
 t/01_load.t

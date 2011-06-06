@@ -1,9 +1,13 @@
 use strict;
 use warnings;
 
-# We do not support other than Win32 for Wx::Scintilla for now
+# We do not support other than Win32 platform for Wx::Scintilla for now
 # So please die and play nice with CPAN testers :)
-die "OS unsupported\n" if $^O ne 'MSWin32';
+# WX_SCINTILLA_BUILD environment variable is only used
+# to allow me to release the package on Linux
+unless ( $^O eq "MSWin32" || $^O eq "cygwin" || defined $ENV{WX_SCINTILLA_BUILD} ) {
+	die "OS unsupported\n";
+}
 
 use lib 'inc';
 use Module::Build::Scintilla ();
@@ -60,7 +64,8 @@ my $builder = Module::Build::Scintilla->new(
 			repository => 'http://svn.perlide.org/padre/trunk/Wx-Scintilla/',
 		}
 	},
-	verbose => 1,
+	dist_abstract => 'Fresh Perl wxWidgets XS bindings for Scintilla editor component',
+	verbose       => 1,
 );
 
 $builder->create_build_script();

@@ -1,5 +1,5 @@
 ---
-abstract: Perl wxWidgets XS bindings for Scintilla editor component
+abstract: 'Fresh Perl wxWidgets XS bindings for Scintilla editor component'
 author:
   - 'Ahmad M. Zawawi <ahmad.zawawi@gmail.com>'
 build_requires:
@@ -18,12 +18,9 @@ meta-spec:
   version: 1.4
 name: Wx-Scintilla
 provides:
-  Wx::Event:
-    file: lib/Wx/Scintilla.pm
-    version: 0
   Wx::Scintilla:
     file: lib/Wx/Scintilla.pm
-    version: 0.02
+    version: 0.03
   Wx::ScintillaTextCtrl:
     file: lib/Wx/Scintilla.pm
     version: 0
@@ -34,4 +31,4 @@ resources:
   homepage: http://padre.perlide.org/
   license: http://dev.perl.org/licenses/
   repository: http://svn.perlide.org/padre/trunk/Wx-Scintilla/
-version: 0.02
+version: 0.03

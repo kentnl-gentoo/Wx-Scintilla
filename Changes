@@ -1,5 +1,12 @@
 Revision history for Wx-Scintilla
 
+0.03	2011.6.6
+	The package version is extracted correctly to prevent test failures (AZAWAWI)
+	Wx::Event is no longer subclassed to prevent the permission error for now (AZAWAWI)
+	Include the important and missing Scintilla.xs (AZAWAWI)
+	More POD documentation (AZAWAWI)
+	Fixed missing dist_abstract warning in Build.PL (AZAWAWI, Reported by SZABGAB)
+
 0.02	2011.6.5
 	Attempt to fix the Wx::Event-subclass-upload-permission error (AZAWAWI)
 

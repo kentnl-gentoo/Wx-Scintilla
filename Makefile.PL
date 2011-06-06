@@ -2,17 +2,17 @@
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
+  'PL_FILES' => {},
+  'INSTALLDIRS' => 'site',
   'NAME' => 'Wx::Scintilla',
+  'EXE_FILES' => [],
   'VERSION_FROM' => 'lib/Wx/Scintilla.pm',
   'PREREQ_PM' => {
-    'Alien::wxWidgets' => 0,
-    'ExtUtils::XSpp' => 0,
-    'File::ShareDir' => 0,
-    'Test::More' => 0,
-    'Wx' => 0
-  },
-  'INSTALLDIRS' => 'site',
-  'EXE_FILES' => [],
-  'PL_FILES' => {}
+                   'Wx' => 0,
+                   'Test::More' => 0,
+                   'Alien::wxWidgets' => 0,
+                   'File::ShareDir' => 0,
+                   'ExtUtils::XSpp' => 0
+                 }
 )
 ;
