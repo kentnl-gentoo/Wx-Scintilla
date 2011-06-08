@@ -10,7 +10,8 @@ build_requires:
   Wx: 0
 configure_requires:
   Module::Build: 0.36
-generated_by: 'Module::Build version 0.3603'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,13 +20,15 @@ name: Wx-Scintilla
 provides:
   Wx::Scintilla:
     file: lib/Wx/Scintilla.pm
-    version: 0.042
+    version: 0.05
   Wx::ScintillaTextCtrl:
     file: lib/Wx/Scintilla.pm
+    version: 0
   Wx::ScintillaTextEvent:
     file: lib/Wx/Scintilla.pm
+    version: 0
 resources:
   homepage: http://padre.perlide.org/
   license: http://dev.perl.org/licenses/
   repository: http://svn.perlide.org/padre/trunk/Wx-Scintilla/
-version: 0.042
+version: 0.05

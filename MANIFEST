@@ -171,3 +171,4 @@ XS/ScintillaTextCtrl.xsp
 XS/ScintillaTextEvent.xsp
 Makefile.PL
 META.yml
+META.json
