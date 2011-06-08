@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Wx;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 # Add Wx::Scintilla distribution directory to PATH on windows so that Wx can load it
 my $wx_scintilla_path;
@@ -33,13 +33,13 @@ XSLoader::load 'Wx::Scintilla', $VERSION;
 
 no strict;
 
-package Wx::ScintillaTextCtrl; our $VERSION = '0.05'; @ISA = qw(Wx::Control);
+package Wx::ScintillaTextCtrl; our $VERSION = '0.06'; @ISA = qw(Wx::Control);
 
-package Wx::ScintillaTextEvent; our $VERSION = '0.05'; @ISA = qw(Wx::CommandEvent);
+package Wx::ScintillaTextEvent; our $VERSION = '0.06'; @ISA = qw(Wx::CommandEvent);
 
 #TODO uncomment when the CPAN permission issue is resolved
 #package Wx::Event;
-#our $VERSION = '0.05'
+#our $VERSION = '0.06'
 
 use strict;
 
@@ -181,10 +181,11 @@ The ambitious goal of this project is to provide fresh Perl 5 and maybe 6
 support in L<Wx> while preserving compatibility with Wx::StyledTextCtrl
 and continually contribute it back to Scintilla project.
 
-=head1 SUPPORTED PLATFORMS
+=head1 PLATFORMS
 
-At the moment, Win32 on strawberry is a supported platform. My next goal is to
-support Ubuntu and then finally MacOS, i wish :)
+At the moment, Linux (Ubuntu) and Windows (Strawberry Perl) are supported platforms. 
+My next goal is to support more platforms. Please let me know if
+you can help out :)
 
 =head1 HISTORY
 

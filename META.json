@@ -32,7 +32,7 @@
    "provides" : {
       "Wx::Scintilla" : {
          "file" : "lib/Wx/Scintilla.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Wx::ScintillaTextCtrl" : {
          "file" : "lib/Wx/Scintilla.pm",
@@ -53,5 +53,5 @@
          "url" : "http://svn.perlide.org/padre/trunk/Wx-Scintilla/"
       }
    },
-   "version" : "0.05"
+   "version" : "0.06"
 }

@@ -11,11 +11,6 @@ unless ( $^O eq 'MSWin32' || $^O eq 'cygwin' || $^O eq 'linux' || defined $ENV{W
 
 use lib 'inc';
 use Module::Build::Scintilla ();
-use Alien::wxWidgets;
-
-my $include_path = Alien::wxWidgets->include_path;
-$include_path =~ s/\-I//g;
-my @include_paths = split( /\s/, $include_path );
 
 my $builder = Module::Build::Scintilla->new(
 	module_name        => 'Wx::Scintilla',
@@ -33,14 +28,6 @@ my $builder = Module::Build::Scintilla->new(
 		'ExtUtils::XSpp'   => 0,
 	},
 	needs_compiler => 0, # We will be doing our own XS compilation
-	include_dirs   => [
-		'.',
-		'wx-scintilla/include',
-		'wx-scintilla/src/scintilla/include',
-		'wx-scintilla/src/scintilla/src',
-		'C:/strawberry/perl/site/lib/Wx',
-		@include_paths
-	],
 	add_to_cleanup => [
 		'Wx-Scintilla-*',
 		'wx-scintilla/src/*.o.d',
@@ -57,15 +44,13 @@ my $builder = Module::Build::Scintilla->new(
 		'*.a',
 		'*.so'
 	],
-	create_makefile_pl => 'traditional',
-	meta_merge         => {
+	meta_merge => {
 		resources => {
 			homepage   => 'http://padre.perlide.org/',
 			repository => 'http://svn.perlide.org/padre/trunk/Wx-Scintilla/',
 		}
 	},
 	dist_abstract => 'Fresh Perl wxWidgets XS bindings for Scintilla editor component',
-	verbose       => 1,
 );
 
 $builder->create_build_script();

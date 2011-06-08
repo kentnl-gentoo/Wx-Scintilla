@@ -2,14 +2,15 @@ package Module::Build::Scintilla;
 
 use strict;
 use warnings;
-use Alien::wxWidgets;
 use Module::Build;
-use Config;
 
 our @ISA = qw(Module::Build);
 
 sub ACTION_build {
 	my $self = shift;
+
+	require Alien::wxWidgets;
+	Alien::wxWidgets->import;
 
 	my $toolkit = Alien::wxWidgets->config->{toolkit};
 	if ( $toolkit eq 'msw' ) {
@@ -39,6 +40,21 @@ sub process_xs_files {
 
 	# Override Module::Build with a null implementation
 	# We will be doing our own custom XS file handling
+}
+
+#
+# Joins the list of commands to form a command, executes it a C<system> call
+# and handles CTRL-C and bad exit codes
+#
+sub _run_command {
+	my $self = shift;
+	my $cmds = shift;
+
+	my $cmd = join( ' ', @$cmds );
+	$self->log_info("$cmd\n");
+	my $rc = system($cmd);
+	die "Failed with exit code $rc" if $rc != 0;
+	die "Ctrl-C interrupted command\n" if $rc & 127;
 }
 
 sub build_scintilla {
@@ -83,18 +99,16 @@ sub build_scintilla {
 				$module,
 			);
 
-			my $cmd = join( ' ', @cmd );
-			$self->log_info("$cmd\n");
-			system($cmd);
+			$self->_run_command( \@cmd );
 		}
 		push @objects, $object_name;
 	}
 
 	# Create distribution share directory
-	my $dist_dir = 'blib/arch/auto/Wx/Scintilla/';
+	my $dist_dir = 'blib/arch/auto/Wx/Scintilla';
 	File::Path::mkpath( $dist_dir, 0, oct(777) );
 
-	my $shared_lib = File::Spec->catfile( $dist_dir . $self->{_wx_scintilla_shared_lib} );
+	my $shared_lib = File::Spec->catfile( $dist_dir, $self->{_wx_scintilla_shared_lib} );
 
 	$self->log_info("Linking $shared_lib\n");
 	my @cmd;
@@ -112,18 +126,17 @@ sub build_scintilla {
 	} elsif ( $self->{_wx_toolkit} =~ 'gtk' ) {
 		@cmd = (
 			Alien::wxWidgets->compiler,
-			'-shared -fPIC -Wl,-soname,' . $shared_lib,
-			'-o ', $shared_lib,
+			'-shared -fPIC',
+			'-Wl,-soname,' . $self->{_wx_scintilla_shared_lib},
+			'-o ' . $shared_lib,
 			join( ' ', @objects ),
 			'-pthread -L/usr/lib/i386-linux-gnu -lgtk-x11-2.0 -lgdk-x11-2.0',
 			'-latk-1.0 -lgio-2.0 -lpangoft2-1.0 -lgdk_pixbuf-2.0 -lm -lpango-1.0 -lfreetype -lfontconfig -lgobject-2.0',
 			'-lgmodule-2.0 -lgthread-2.0 -lrt -lglib-2.0 -lpng -lz -ldl -lm',
 		);
 	}
-	my $cmd = join( ' ', @cmd );
 
-	$self->log_info("$cmd\n");
-	system($cmd);
+	$self->_run_command( \@cmd );
 }
 
 sub build_xs {
@@ -134,11 +147,11 @@ sub build_xs {
 	my @cmd;
 	my $cmd;
 
-	my $perl_lib = $Config{privlibexp};
+	my $perl_lib = $self->config('privlibexp');
 	$perl_lib =~ s/\\/\//g;
-	my $perl_arch_lib = $Config{archlib};
+	my $perl_arch_lib = $self->config('archlib');
 	$perl_arch_lib =~ s/\\/\//g;
-	my $perl_site_arch = $Config{sitearch};
+	my $perl_site_arch = $self->config('sitearch');
 	$perl_site_arch =~ s/\\/\//g;
 
 	require ExtUtils::ParseXS;
@@ -194,9 +207,7 @@ sub build_xs {
 		);
 
 	}
-	$cmd = join( ' ', @cmd );
-	$self->log_info("$cmd\n");
-	system($cmd);
+	$self->_run_command( \@cmd );
 
 	if ( open my $fh, '>Scintilla.bs' ) {
 		close $fh;
@@ -217,13 +228,16 @@ sub build_xs {
 		);
 	}
 
-	my $dll = 'blib/arch/auto/Wx/Scintilla/' . ( $self->{_wx_toolkit} eq 'msw' ? 'Scintilla.dll' : 'Scintilla.so' );
+	my $dll = File::Spec->catfile(
+		'blib/arch/auto/Wx/Scintilla',
+		$self->{_wx_toolkit} eq 'msw' ? 'Scintilla.dll' : 'Scintilla.so'
+	);
 	if ( $toolkit eq 'msw' ) {
 		@cmd = (
 			Alien::wxWidgets->compiler,
 			'-shared -s -o ' . $dll,
 			'Scintilla.o',
-			File::Spec->catfile( $perl_arch_lib, 'CORE/' . $Config{libperl} ),
+			File::Spec->catfile( $perl_arch_lib, 'CORE/' . $self->config('libperl') ),
 			Alien::wxWidgets->libraries(qw(core base)) . ' -lgdi32',
 			$self->{_wx_scintilla_lib},
 			'Scintilla.def',
@@ -231,7 +245,7 @@ sub build_xs {
 	} else {
 
 		#GTK
-		my $shared_lib = File::Spec->catfile( 'blib/arch/auto/Wx/Scintilla/' . $self->{_wx_scintilla_shared_lib} );
+		my $shared_lib = File::Spec->catfile( 'blib/arch/auto/Wx/Scintilla/', $self->{_wx_scintilla_shared_lib} );
 
 		@cmd = (
 			Alien::wxWidgets->compiler,
@@ -239,14 +253,14 @@ sub build_xs {
 			'Scintilla.o',
 			'-L/usr/local/lib',
 			'-fstack-protector',
-			File::Spec->catfile( $perl_arch_lib, 'CORE/' . $Config{libperl} ),
+			File::Spec->catfile( $perl_arch_lib, 'CORE/' . $self->config('libperl') ),
 			Alien::wxWidgets->libraries(qw(core base)),
 			$shared_lib,
+			'-Wl,-rpath,blib/arch/auto/Wx/Scintilla',
+			'-Wl,-rpath,' . File::Spec->catfile( $self->install_destination('arch'), 'auto/Wx/Scintilla' ),
 		);
 	}
-	$cmd = join( ' ', @cmd );
-	$self->log_info("$cmd\n");
-	system($cmd);
+	$self->_run_command( \@cmd );
 
 	chmod( 0755, $dll );
 

@@ -1,3 +1,16 @@
+
+use strict;
+use warnings;
+use Test::More;
+
+BEGIN {
+	unless ( $ENV{DISPLAY} or $^O eq 'MSWin32' ) {
+		plan skip_all => 'Needs DISPLAY';
+		exit 0;
+	}
+}
+plan( tests => 3 );
+
 #----> My first scintilla Wx editor :)
 package My::Scintilla::Editor;
 
@@ -5,8 +18,8 @@ use strict;
 use warnings;
 
 # Load Wx::Scintilla
-use Wx::Scintilla ();    # replaces use Wx::STC
-use base 'Wx::ScintillaTextCtrl';    # replaces Wx::StyledTextCtrl
+use Wx::Scintilla (); # replaces use Wx::STC
+use base 'Wx::ScintillaTextCtrl'; # replaces Wx::StyledTextCtrl
 
 use Wx qw(:everything);
 use Wx::Event;
@@ -45,10 +58,23 @@ sub new {
 	# set the lexer to Perl 5
 	$self->SetLexer(wxSTC_LEX_PERL);
 
-	$self->SetText('Hello world, Scintilla');
+	my $text = 'Hello world, Scintilla';
+	$self->SetText($text);
+	main::ok( $text eq $self->GetText, 'SetText, GetText work' );
 	$self->SetFocus;
 
 	return $self;
+}
+
+package MyTimer;
+
+use vars qw(@ISA); @ISA = qw(Wx::Timer);
+
+sub Notify {
+	my $self  = shift;
+	my $frame = Wx::wxTheApp()->GetTopWindow;
+	$frame->Destroy;
+	main::ok( 1, "Timer works.. Destroyed frame!" );
 }
 
 #----> DEMO EDITOR APPLICATION
@@ -65,17 +91,21 @@ use base 'Wx::App';
 sub OnInit {
 	my $self = shift;
 
-	my $frame = Wx::Frame->new(
-	undef,                           # no parent window
-	-1,                              # no window id
-	'My First Scintilla Editor!',    # Window title
+	my $frame = $self->{frame} = Wx::Frame->new(
+		undef,                        # no parent window
+		-1,                           # no window id
+		'My First Scintilla Editor!', # Window title
 	);
 
 	my $editor = My::Scintilla::Editor->new(
-	$frame,                          # Parent window
+		$frame,                       # Parent window
 	);
+	main::ok( $editor, 'Editor instance created' );
 
 	$frame->Show(1);
+
+	MyTimer->new->Start( 500, 1 );
+
 	return 1;
 }
 

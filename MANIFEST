@@ -11,6 +11,7 @@ Scintilla_README
 share/editor.pl
 t/01_load.t
 t/02_inheritance.t
+t/03_editor.t
 t/lib/Tests_Helper.pm
 typemap
 wx-scintilla/include/WxScintilla.h
@@ -169,6 +170,5 @@ wx_typemap
 wx_typemap.xsp
 XS/ScintillaTextCtrl.xsp
 XS/ScintillaTextEvent.xsp
-Makefile.PL
 META.yml
 META.json
