@@ -19,7 +19,7 @@ sub ACTION_build {
 		$self->{_wx_mthreads_define}      = '-mthreads';
 		$self->{_wx_msw_define}           = '-DHAVE_W32API_H';
 		$self->{_wx_scintilla_shared_lib} = 'libwx_msw28u_scintilla.dll';
-		$self->{_wx_scintilla_lib}        = 'libwx_msw28u_scintilla.a';
+		$self->{_wx_scintilla_lib} = 'libwx_msw28u_scintilla.' . ( Alien::wxWidgets->compiler eq 'cl' ? 'lib' : 'a' );
 	} elsif ( $toolkit =~ 'gtk' ) {
 		$self->{_wx_toolkit}              = $toolkit;
 		$self->{_wx_toolkit_define}       = '-D__WXGTK__';
@@ -69,36 +69,62 @@ sub build_scintilla {
 		'wx-scintilla/src/scintilla.cpp',
 	);
 
-	my @include_dirs = (
-		'-Iwx-scintilla/include',
-		'-Iwx-scintilla/src/scintilla/include',
-		'-Iwx-scintilla/src/scintilla/src',
-		'-Iwx-scintilla/src',
+	my $compiler        = Alien::wxWidgets->compiler;
+	my $include_command = $compiler eq 'cl' ? '/I' : '-I';
+	my @include_dirs    = (
+		$include_command . 'wx-scintilla/include',
+		$include_command . 'wx-scintilla/src/scintilla/include',
+		$include_command . 'wx-scintilla/src/scintilla/src',
+		$include_command . 'wx-scintilla/src',
 		Alien::wxWidgets->include_path
 	);
 
 	my @objects = ();
 	for my $module (@modules) {
 		my $filename = File::Basename::basename($module);
-		$filename =~ s/(.c|.cpp|.cxx)$/.o/;
-		my $object_name = File::Spec->catfile( File::Basename::dirname($module), "scintilladll_$filename" );
+		my $object_name;
+		if ( $compiler eq 'cl' ) {
+			$filename =~ s/(.c|.cpp|.cxx)$/.obj/;
+		} else {
+			$filename =~ s/(.c|.cpp|.cxx)$/.o/;
+		}
+		$object_name = File::Spec->catfile( File::Basename::dirname($module), "scintilladll_$filename" );
 		unless ( -f $object_name ) {
-			my @cmd = (
-				Alien::wxWidgets->compiler,
-				'-c',
-				'-o ' . $object_name,
-				'-O2 ' . $self->{_wx_mthreads_define} . ' ' . $self->{_wx_msw_define} . ' -D_UNICODE',
-				'-Wall ',
-				'-DWXBUILDING ' . $self->{_wx_toolkit_define} . ' -D__WX__ -DSCI_LEXER ',
-				'-D__WX__ -DSCI_LEXER -DLINK_LEXERS -DWXUSINGDLL -DWXMAKINGDLL_STC',
-				'-Wno-ctor-dtor-privacy',
-				'-MT' . $object_name,
-				'-MF' . $object_name . '.d',
-				'-MD -MP',
-				join( ' ', @include_dirs ),
-				$module,
-			);
+			my $cmd;
+			my @cmd;
+			if ( $compiler eq 'cl' ) {
 
+				# MS VC compiler
+				@cmd = (
+					$compiler,
+					'/c /nologo /TP /Fo' . $object_name,
+					'/MD /DWIN32',
+					'/O2',
+					'-D__WXMSW__',
+					'/DNDEBUG /D_UNICODE',
+					join( ' ', @include_dirs ),
+					'/W4 /DWXBUILDING /D__WX__ /DSCI_LEXER /DLINK_LEXERS  /DWXUSINGDLL /DWXMAKINGDLL_STC /GR /EHsc',
+					$module,
+				);
+			} else {
+
+				# Assume gcc
+				@cmd = (
+					$compiler,
+					'-c',
+					'-o ' . $object_name,
+					'-O2 ' . $self->{_wx_mthreads_define} . ' ' . $self->{_wx_msw_define} . ' -D_UNICODE',
+					'-Wall ',
+					'-DWXBUILDING ' . $self->{_wx_toolkit_define} . ' -D__WX__ -DSCI_LEXER ',
+					'-D__WX__ -DSCI_LEXER -DLINK_LEXERS -DWXUSINGDLL -DWXMAKINGDLL_STC',
+					'-Wno-ctor-dtor-privacy',
+					'-MT' . $object_name,
+					'-MF' . $object_name . '.d',
+					'-MD -MP',
+					join( ' ', @include_dirs ),
+					$module,
+				);
+			}
 			$self->_run_command( \@cmd );
 		}
 		push @objects, $object_name;
@@ -114,18 +140,34 @@ sub build_scintilla {
 	my @cmd;
 
 	if ( $self->{_wx_toolkit} eq 'msw' ) {
-		@cmd = (
-			Alien::wxWidgets->compiler,
-			'-shared -fPIC -o ' . $shared_lib,
-			$self->{_wx_mthreads_define},
-			join( ' ', @objects ),
-			'-Wl,--out-implib=' . $self->{_wx_scintilla_lib},
-			'-lgdi32',
-			Alien::wxWidgets->libraries(qw(core base)),
-		);
+		if ( $compiler eq 'cl' ) {
+
+			# MS VC compiler
+			@cmd = (
+				Alien::wxWidgets->linker,
+				"wx-scintilla/src/*.obj",
+				"wx-scintilla/src/scintilla/src/*.obj",
+				"/DLL /NOLOGO /OUT:$shared_lib",
+				'/LIBPATH:"' . Alien::wxWidgets->shared_library_path . '"',
+				Alien::wxWidgets->link_libraries(qw(core base)),
+				'gdi32.lib user32.lib',
+			);
+		} else {
+
+			# Assume gcc
+			@cmd = (
+				$compiler,
+				'-shared -fPIC -o ' . $shared_lib,
+				$self->{_wx_mthreads_define},
+				join( ' ', @objects ),
+				'-Wl,--out-implib=' . $self->{_wx_scintilla_lib},
+				'-lgdi32',
+				Alien::wxWidgets->libraries(qw(core base)),
+			);
+		}
 	} elsif ( $self->{_wx_toolkit} =~ 'gtk' ) {
 		@cmd = (
-			Alien::wxWidgets->compiler,
+			$compiler,
 			'-shared -fPIC',
 			'-Wl,-soname,' . $self->{_wx_scintilla_shared_lib},
 			'-o ' . $shared_lib,
@@ -167,31 +209,53 @@ sub build_xs {
 		],
 	);
 
+	my $compiler     = Alien::wxWidgets->compiler;
 	my $dist_version = $self->dist_version;
 	my $toolkit      = $self->{_wx_toolkit};
 	if ( $toolkit eq 'msw' ) {
 
 		# win32
-		@cmd = (
-			Alien::wxWidgets->compiler,
-			Alien::wxWidgets->c_flags . ' -c -o Scintilla.o',
-			'-I.',
-			'-I' . File::Spec->catfile( $perl_site_arch, 'Wx' ),
-			Alien::wxWidgets->include_path,
-			'-s -O2 -DWIN32 -DHAVE_DES_FCRYPT -DUSE_SITECUSTOMIZE -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS',
-			'-fno-strict-aliasing -mms-bitfields -DPERL_MSVCRT_READFIX -s -O2',
-			'-DVERSION=\"' . $dist_version . '\" -DXS_VERSION=\"' . $dist_version . '\"',
-			'-I' . File::Spec->catfile( $perl_arch_lib, 'CORE' ),
-			'-DWXPL_EXT -DHAVE_W32API_H '
-				. $self->{_wx_toolkit_define}
-				. ' -D_UNICODE -DWXUSINGDLL -DNOPCH -DNO_GCC_PRAGMA',
-			'Scintilla.c',
-		);
+		if ( $compiler eq 'cl' ) {
+
+			# MS VC Compiler
+			@cmd = (
+				$compiler,
+				Alien::wxWidgets->c_flags . ' -c /FoScintilla.obj',
+				'-I.',
+				'-I' . File::Spec->catfile( $perl_site_arch, 'Wx' ),
+				Alien::wxWidgets->include_path,
+				'-nologo -GF -W3 -MD -Zi -DNDEBUG -O1 -DWIN32 -D_CONSOLE -DNO_STRICT -DHAVE_DES_FCRYPT',
+				'-DUSE_SITECUSTOMIZE -DPRIVLIB_LAST_IN_INC -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS',
+				'-DUSE_PERLIO -DPERL_MSVCRT_READFIX -MD -Zi -DNDEBUG -O1',
+				'-DVERSION=\"' . $dist_version . '\"  -DXS_VERSION=\"' . $dist_version . '\"',
+				'-I' . File::Spec->catfile( $perl_arch_lib, 'CORE' ),
+				'-DWXPL_EXT -DWIN32 -D__WXMSW__ -DNDEBUG -D_UNICODE -DWXUSINGDLL -D_WINDOWS -DNOPCH  -D_CRT_SECURE_NO_DEPRECATE Scintilla.c'
+			);
+
+		} else {
+
+			# Assume GCC
+			@cmd = (
+				$compiler,
+				Alien::wxWidgets->c_flags . ' -c -o Scintilla.o',
+				'-I.',
+				'-I' . File::Spec->catfile( $perl_site_arch, 'Wx' ),
+				Alien::wxWidgets->include_path,
+				'-s -O2 -DWIN32 -DHAVE_DES_FCRYPT -DUSE_SITECUSTOMIZE -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS',
+				'-fno-strict-aliasing -mms-bitfields -DPERL_MSVCRT_READFIX -s -O2',
+				'-DVERSION=\"' . $dist_version . '\" -DXS_VERSION=\"' . $dist_version . '\"',
+				'-I' . File::Spec->catfile( $perl_arch_lib, 'CORE' ),
+				'-DWXPL_EXT -DHAVE_W32API_H '
+					. $self->{_wx_toolkit_define}
+					. ' -D_UNICODE -DWXUSINGDLL -DNOPCH -DNO_GCC_PRAGMA',
+				'Scintilla.c',
+			);
+		}
 	} else {
 
 		# GTK
 		@cmd = (
-			Alien::wxWidgets->compiler,
+			$compiler,
 			Alien::wxWidgets->c_flags . ' -c -o Scintilla.o',
 			'-I.',
 			'-I' . File::Spec->catfile( $perl_site_arch, 'Wx' ),
@@ -233,22 +297,37 @@ sub build_xs {
 		$self->{_wx_toolkit} eq 'msw' ? 'Scintilla.dll' : 'Scintilla.so'
 	);
 	if ( $toolkit eq 'msw' ) {
-		@cmd = (
-			Alien::wxWidgets->compiler,
-			'-shared -s -o ' . $dll,
-			'Scintilla.o',
-			File::Spec->catfile( $perl_arch_lib, 'CORE/' . $self->config('libperl') ),
-			Alien::wxWidgets->libraries(qw(core base)) . ' -lgdi32',
-			$self->{_wx_scintilla_lib},
-			'Scintilla.def',
-		);
+
+		if ( $compiler eq 'cl' ) {
+			@cmd = (
+				Alien::wxWidgets->linker,
+				'/out:' . $dll,
+				'/dll /nologo /nodefaultlib /debug /opt:ref,icf',
+				'/machine:x86 Scintilla.obj',
+				File::Spec->catfile( $perl_arch_lib, 'CORE/' . $self->config('libperl') ),
+				'blib/arch/auto/Wx/Scintilla/' . $self->{_wx_scintilla_lib},
+				'/LIBPATH:"' . Alien::wxWidgets->shared_library_path . '"',
+				Alien::wxWidgets->link_libraries(qw(core base)),
+				'gdi32.lib user32.lib kernel32.lib msvcrt.lib',
+			);
+		} else {
+			@cmd = (
+				$compiler,
+				'-shared -s -o ' . $dll,
+				'Scintilla.o',
+				File::Spec->catfile( $perl_arch_lib, 'CORE/' . $self->config('libperl') ),
+				Alien::wxWidgets->libraries(qw(core base)) . ' -lgdi32',
+				$self->{_wx_scintilla_lib},
+				'Scintilla.def',
+			);
+		}
 	} else {
 
 		#GTK
 		my $shared_lib = File::Spec->catfile( 'blib/arch/auto/Wx/Scintilla/', $self->{_wx_scintilla_shared_lib} );
 
 		@cmd = (
-			Alien::wxWidgets->compiler,
+			$compiler,
 			'-shared -s -o ' . $dll,
 			'Scintilla.o',
 			'-L/usr/local/lib',

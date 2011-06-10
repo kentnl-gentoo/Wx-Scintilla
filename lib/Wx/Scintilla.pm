@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Wx;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # Add Wx::Scintilla distribution directory to PATH on windows so that Wx can load it
 my $wx_scintilla_path;
@@ -33,13 +33,13 @@ XSLoader::load 'Wx::Scintilla', $VERSION;
 
 no strict;
 
-package Wx::ScintillaTextCtrl; our $VERSION = '0.07'; @ISA = qw(Wx::Control);
+package Wx::ScintillaTextCtrl; our $VERSION = '0.08'; @ISA = qw(Wx::Control);
 
-package Wx::ScintillaTextEvent; our $VERSION = '0.07'; @ISA = qw(Wx::CommandEvent);
+package Wx::ScintillaTextEvent; our $VERSION = '0.08'; @ISA = qw(Wx::CommandEvent);
 
 #TODO uncomment when the CPAN permission issue is resolved
 #package Wx::Event;
-#our $VERSION = '0.07'
+#our $VERSION = '0.08'
 
 use strict;
 
@@ -183,9 +183,13 @@ and continually contribute it back to Scintilla project.
 
 =head1 PLATFORMS
 
-At the moment, Linux (Ubuntu) and Windows (Strawberry Perl) are supported platforms. 
-My next goal is to support more platforms. Please let me know if
-you can help out :)
+At the moment, Linux (Ubuntu) and Windows (Strawberry and ActivePerl) 
+are supported platforms. My next goal is to support more platforms. Please
+let me know if you can help out :)
+
+On Ubuntu, you need to install the following via:
+
+	sudo apt-get install libwxbase2.8-0 libwxgtk2.8-0 libwxbase2.8-dev libgtk2.0-dev
 
 =head1 HISTORY
 
