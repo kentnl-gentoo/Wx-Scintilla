@@ -4,8 +4,6 @@ cpp/st_constants.cpp
 inc/Module/Build/Scintilla.pm
 lib/Wx/Scintilla.pm
 MANIFEST			This list of files
-META.json
-META.yml
 padre_wx_scintilla.patch
 README
 Scintilla.xs
@@ -172,3 +170,4 @@ wx_typemap
 wx_typemap.xsp
 XS/ScintillaTextCtrl.xsp
 XS/ScintillaTextEvent.xsp
+META.yml
