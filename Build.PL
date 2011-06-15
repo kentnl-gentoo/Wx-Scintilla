@@ -41,7 +41,8 @@ my $builder = Module::Build::Scintilla->new(
 		'*.a',
 		'*.so'
 	],
-	meta_merge => {
+	create_makefile_pl => 'small',
+	meta_merge         => {
 		resources => {
 			homepage   => 'http://padre.perlide.org/',
 			repository => 'http://svn.perlide.org/padre/trunk/Wx-Scintilla/',

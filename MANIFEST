@@ -170,4 +170,5 @@ wx_typemap
 wx_typemap.xsp
 XS/ScintillaTextCtrl.xsp
 XS/ScintillaTextEvent.xsp
+Makefile.PL
 META.yml
