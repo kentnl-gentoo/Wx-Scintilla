@@ -2,9 +2,12 @@ Build.PL
 Changes
 cpp/st_constants.cpp
 inc/Module/Build/Scintilla.pm
+inc/Module/Build/Scintilla/GTK.pm
+inc/Module/Build/Scintilla/MSW.pm
+inc/Module/Build/Scintilla/MSWgcc.pm
+inc/Module/Build/Scintilla/OSX.pm
 lib/Wx/Scintilla.pm
 MANIFEST			This list of files
-padre_wx_scintilla.patch
 README
 Scintilla.xs
 Scintilla_README

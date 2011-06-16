@@ -2,5 +2,5 @@
     use Module::Build::Compat 0.02;
     use lib 'inc';
     Module::Build::Compat->run_build_pl(args => \@ARGV);
-    require Module::Build::Scintilla;
-    Module::Build::Compat->write_makefile(build_class => 'Module::Build::Scintilla');
+    require Module::Build::Scintilla::GTK;
+    Module::Build::Compat->write_makefile(build_class => 'Module::Build::Scintilla::GTK');
