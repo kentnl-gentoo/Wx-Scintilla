@@ -50,6 +50,34 @@ sub stc_build_scintilla_object {
 	$self->_run_command( \@cmd );
 }
 
+sub stc_prebuild_check {
+	my $self      = shift;
+	my $ld        = Alien::wxWidgets->linker;
+	my $libstring = $self->stc_extra_scintilla_libs;
+	my $outfile   = 'stc_checkdepends.out';
+	my $command   = qq($ld -fPIC -shared $libstring -o $outfile);
+	if ( system($command) ) {
+		unlink($outfile);
+		print qq(Check for gtk2 development libraries failed.\n);
+		print qq(Perhaps you need to install package libgtk2.0-dev or the equivalent for your system.\n);
+		print qq(You can ofcourse uninstall it later after the installation is complete.\n);
+		print qq(The build cannot continue.\n);
+		exit(1);
+	}
+	unlink($outfile);
+	return 1;
+}
+
+sub stc_extra_scintilla_libs {
+	my $self   = shift;
+	my $extras = '-lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lpangoft2-1.0 ';
+	$extras .= '-lgdk_pixbuf-2.0 -lm -lpango-1.0 -lfreetype -lfontconfig -lgobject-2.0 ';
+	$extras .= '-lgmodule-2.0 -lgthread-2.0 -lrt -lglib-2.0 -lpng -lz -ldl -lm ';
+
+	#'-lgio-2.0', # does not apper to be needed and not present on some systems
+	return $extras;
+}
+
 sub stc_link_scintilla_objects {
 	my ( $self, $shared_lib, $objects ) = @_;
 
@@ -60,16 +88,9 @@ sub stc_link_scintilla_objects {
 		' -o ' . $shared_lib,
 		join( ' ', @$objects ),
 		$self->stc_link_paths,
-		'-lgtk-x11-2.0 -lgdk-x11-2.0',
-		'-latk-1.0',
-
-		#'-lgio-2.0', # does not apper to be needed and not present on some systems
-		'-lpangoft2-1.0 -lgdk_pixbuf-2.0 -lm -lpango-1.0 -lfreetype -lfontconfig -lgobject-2.0',
-		'-lgmodule-2.0 -lgthread-2.0 -lrt -lglib-2.0 -lpng -lz -ldl -lm',
+		$self->stc_extra_scintilla_libs,
 		Alien::wxWidgets->libraries(qw(core base)),
 		'-Wl,-soname,' . $shared_lib,
-
-
 	);
 
 	$self->_run_command( \@cmd );
@@ -131,12 +152,10 @@ sub stc_find_libperl {
 	my $link        = ( $libperlname =~ /\.a$/ ) ? 'static' : 'shared';
 
 	if ( $link eq 'static' ) {
-		return qq($archlib/CORE/$libperlname);
+		return '';
 	}
 
-	my $testforlibperl = $libperlname;
-	$testforlibperl =~ s/\.a$/\.so/;
-	my $dllpath = qq($archlib/CORE/$testforlibperl);
+	my $dllpath = qq($archlib/CORE/$libperlname);
 	return $dllpath if -f $dllpath;
 	if ( $link eq 'shared' ) {
 
@@ -144,7 +163,7 @@ sub stc_find_libperl {
 		my $returnpath = '';
 		my @libperlpaths = split( /\s+/, $Config::Config{libpth} );
 		for my $libdir (@libperlpaths) {
-			if ( -f qq($libdir/$testforlibperl) ) {
+			if ( -f qq($libdir/$libperlname) ) {
 				$returnpath = (qq($libdir/$libperlname));
 				last;
 			}

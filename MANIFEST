@@ -12,6 +12,7 @@ README
 Scintilla.xs
 Scintilla_README
 share/editor.pl
+share/perl6_editor.pl
 t/01_load.t
 t/02_inheritance.t
 t/03_editor.t
@@ -109,6 +110,7 @@ wx-scintilla/src/scintilla/src/LexOthers.cxx
 wx-scintilla/src/scintilla/src/LexPascal.cxx
 wx-scintilla/src/scintilla/src/LexPB.cxx
 wx-scintilla/src/scintilla/src/LexPerl.cxx
+wx-scintilla/src/scintilla/src/LexPerl6.cxx
 wx-scintilla/src/scintilla/src/LexPLM.cxx
 wx-scintilla/src/scintilla/src/LexPOV.cxx
 wx-scintilla/src/scintilla/src/LexPowerPro.cxx
@@ -175,3 +177,4 @@ XS/ScintillaTextCtrl.xsp
 XS/ScintillaTextEvent.xsp
 Makefile.PL
 META.yml
+META.json

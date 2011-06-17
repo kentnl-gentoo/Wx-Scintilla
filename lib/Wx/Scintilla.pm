@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Wx;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 # Add Wx::Scintilla distribution directory to PATH on windows so that Wx can load it
 my $wx_scintilla_path;
@@ -21,6 +21,9 @@ if ( $ENV{HARNESS_ACTIVE} ) {
 }
 $ENV{PATH} = $wx_scintilla_path . ';' . $ENV{PATH} if ( $^O eq 'MSWin32' );
 
+# Define Perl 6 lexer
+use constant wxSCINTILLA_LEX_PERL6 => 98;
+
 # Load scintilla's DLL through Wx and ask XSLoader to load it
 # NOTE: Do not use Wx::boot since it is buggy and causes test suite to fail while upgrading
 Wx::load_dll('scintilla');
@@ -34,19 +37,19 @@ XSLoader::load 'Wx::Scintilla', $VERSION;
 no strict;
 
 package Wx::ScintillaTextCtrl;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 @ISA = qw(Wx::Control);
 
 package Wx::ScintillaTextEvent;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 @ISA = qw(Wx::CommandEvent);
 
 #Defeat the indexer by splitting the package declaration on two lines
 #<<<  do not let perltidy touch this
 package
 	Wx::Event;
+# Don't set global Wx::Event version
 #>>>
-our $VERSION = '0.11';
 
 use strict;
 
@@ -85,7 +88,7 @@ __END__
 
 =head1 NAME
 
-Wx::Scintilla - Fresh Perl wxWidgets XS bindings for Scintilla editor component
+Wx::Scintilla - wxWidgets Perl XS wrapper for the Scintilla editor component
 
 =head1 SYNOPSIS
 
@@ -190,13 +193,13 @@ and continually contribute it back to Scintilla project.
 
 =head1 PLATFORMS
 
-At the moment, Linux (Ubuntu) and Windows (Strawberry and ActivePerl) 
-are supported platforms. My next goal is to support more platforms. Please
-let me know if you can help out :)
+At the moment, Linux (Debian, Ubuntu, Fedora, CentOS) and Windows (Strawberry
+and ActivePerl)  are supported platforms. My next goal is to support more 
+platforms. Please let me know if you can help out :)
 
-On Ubuntu, you need to install the following via:
+On Debian/Ubuntu, you need to install the following via:
 
-	sudo apt-get install libwxbase2.8-0 libwxgtk2.8-0 libwxbase2.8-dev libgtk2.0-dev
+	sudo apt-get install libgtk2.0-dev
 
 =head1 HISTORY
 
@@ -216,7 +219,7 @@ fold.perl.comment.explicit. Fold structure for Perl fixed.
 Perl folder works for array blocks, adjacent package statements, nested PODs,
 and terminates package folding at DATA, D and Z.
 
-=item Release 1.79
+=item Release 1.79 (Currently we're here)
 
 Perl lexer bug fixed where previous lexical states persisted causing "/" special 
 case styling and subroutine prototype styling to not be correct.
@@ -248,13 +251,19 @@ Perl lexer allows UTF-8 identifiers and has some other small improvements.
 
 =head1 ACKNOWLEDGEMENTS
 
-Gabor Szabo L<http://szabgab.com> for the idea to backport Perl lexer for
-wxWidgets 2.8.10 L<http://padre.perlide.org/trac/ticket/257> and all of #padre
-members for the continuous support and testing. Thanks!
+Neil Hudgson for creating and maintaining the excellent Scintilla project
+L<http://scintilla.org>. Thanks!
 
 Robin Dunn L<http://alldunn.com/robin/> for the excellent scintilla 
 contribution that he made to wxWidgets. This work is based on his codebase.
 Thanks!
+
+Mark dootson L<http://search.cpan.org/~mdootson/> for his big effort to make
+Wx::Scintilla compilable on various platforms. Big thanks!
+
+Heiko Jansen and Gabor Szabo L<http://szabgab.com> for the idea to backport
+Perl lexer for wxWidgets 2.8.10 L<http://padre.perlide.org/trac/ticket/257>
+and all of #padre members for the continuous support and testing. Thanks!
 
 =head1 SUPPORT
 
@@ -267,6 +276,7 @@ For other issues, contact the maintainer.
 =head1 AUTHOR
 
 Ahmad M. Zawawi <ahmad.zawawi@gmail.com>
+Mark Dootson
 
 =head1 SEE ALSO
 
