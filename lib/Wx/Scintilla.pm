@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Wx;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 # Add Wx::Scintilla distribution directory to PATH on windows so that Wx can load it
 my $wx_scintilla_path;
@@ -37,11 +37,11 @@ XSLoader::load 'Wx::Scintilla', $VERSION;
 no strict;
 
 package Wx::ScintillaTextCtrl;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 @ISA = qw(Wx::Control);
 
 package Wx::ScintillaTextEvent;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 @ISA = qw(Wx::CommandEvent);
 
 #Defeat the indexer by splitting the package declaration on two lines
@@ -53,32 +53,38 @@ package
 
 use strict;
 
-sub EVT_SCINTILLA_CHANGE($$$)            { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_CHANGE,            $_[2] ) }
-sub EVT_SCINTILLA_STYLENEEDED($$$)       { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_STYLENEEDED,       $_[2] ) }
-sub EVT_SCINTILLA_CHARADDED($$$)         { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_CHARADDED,         $_[2] ) }
-sub EVT_SCINTILLA_SAVEPOINTREACHED($$$)  { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_SAVEPOINTREACHED,  $_[2] ) }
-sub EVT_SCINTILLA_SAVEPOINTLEFT($$$)     { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_SAVEPOINTLEFT,     $_[2] ) }
-sub EVT_SCINTILLA_ROMODIFYATTEMPT($$$)   { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_ROMODIFYATTEMPT,   $_[2] ) }
-sub EVT_SCINTILLA_KEY($$$)               { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_KEY,               $_[2] ) }
-sub EVT_SCINTILLA_DOUBLECLICK($$$)       { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_DOUBLECLICK,       $_[2] ) }
-sub EVT_SCINTILLA_UPDATEUI($$$)          { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_UPDATEUI,          $_[2] ) }
-sub EVT_SCINTILLA_MODIFIED($$$)          { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_MODIFIED,          $_[2] ) }
-sub EVT_SCINTILLA_MACRORECORD($$$)       { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_MACRORECORD,       $_[2] ) }
-sub EVT_SCINTILLA_MARGINCLICK($$$)       { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_MARGINCLICK,       $_[2] ) }
-sub EVT_SCINTILLA_NEEDSHOWN($$$)         { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_NEEDSHOWN,         $_[2] ) }
-sub EVT_SCINTILLA_POSCHANGED($$$)        { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_POSCHANGED,        $_[2] ) }
-sub EVT_SCINTILLA_PAINTED($$$)           { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_PAINTED,           $_[2] ) }
-sub EVT_SCINTILLA_USERLISTSELECTION($$$) { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_USERLISTSELECTION, $_[2] ) }
-sub EVT_SCINTILLA_URIDROPPED($$$)        { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_URIDROPPED,        $_[2] ) }
-sub EVT_SCINTILLA_DWELLSTART($$$)        { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_DWELLSTART,        $_[2] ) }
-sub EVT_SCINTILLA_DWELLEND($$$)          { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_DWELLEND,          $_[2] ) }
-sub EVT_SCINTILLA_START_DRAG($$$)        { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_START_DRAG,        $_[2] ) }
-sub EVT_SCINTILLA_DRAG_OVER($$$)         { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_DRAG_OVER,         $_[2] ) }
-sub EVT_SCINTILLA_DO_DROP($$$)           { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_DO_DROP,           $_[2] ) }
-sub EVT_SCINTILLA_ZOOM($$$)              { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_ZOOM,              $_[2] ) }
-sub EVT_SCINTILLA_HOTSPOT_CLICK($$$)     { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_HOTSPOT_CLICK,     $_[2] ) }
-sub EVT_SCINTILLA_HOTSPOT_DCLICK($$$)    { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_HOTSPOT_DCLICK,    $_[2] ) }
-sub EVT_SCINTILLA_CALLTIP_CLICK($$$)     { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_CALLTIP_CLICK,     $_[2] ) }
+{
+
+	# Disable Wx::EVT_STC_* event warning redefinition
+	no warnings 'redefine';
+
+	sub EVT_STC_CHANGE($$$)            { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_CHANGE,            $_[2] ) }
+	sub EVT_STC_STYLENEEDED($$$)       { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_STYLENEEDED,       $_[2] ) }
+	sub EVT_STC_CHARADDED($$$)         { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_CHARADDED,         $_[2] ) }
+	sub EVT_STC_SAVEPOINTREACHED($$$)  { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_SAVEPOINTREACHED,  $_[2] ) }
+	sub EVT_STC_SAVEPOINTLEFT($$$)     { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_SAVEPOINTLEFT,     $_[2] ) }
+	sub EVT_STC_ROMODIFYATTEMPT($$$)   { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_ROMODIFYATTEMPT,   $_[2] ) }
+	sub EVT_STC_KEY($$$)               { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_KEY,               $_[2] ) }
+	sub EVT_STC_DOUBLECLICK($$$)       { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_DOUBLECLICK,       $_[2] ) }
+	sub EVT_STC_UPDATEUI($$$)          { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_UPDATEUI,          $_[2] ) }
+	sub EVT_STC_MODIFIED($$$)          { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_MODIFIED,          $_[2] ) }
+	sub EVT_STC_MACRORECORD($$$)       { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_MACRORECORD,       $_[2] ) }
+	sub EVT_STC_MARGINCLICK($$$)       { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_MARGINCLICK,       $_[2] ) }
+	sub EVT_STC_NEEDSHOWN($$$)         { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_NEEDSHOWN,         $_[2] ) }
+	sub EVT_STC_POSCHANGED($$$)        { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_POSCHANGED,        $_[2] ) }
+	sub EVT_STC_PAINTED($$$)           { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_PAINTED,           $_[2] ) }
+	sub EVT_STC_USERLISTSELECTION($$$) { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_USERLISTSELECTION, $_[2] ) }
+	sub EVT_STC_URIDROPPED($$$)        { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_URIDROPPED,        $_[2] ) }
+	sub EVT_STC_DWELLSTART($$$)        { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_DWELLSTART,        $_[2] ) }
+	sub EVT_STC_DWELLEND($$$)          { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_DWELLEND,          $_[2] ) }
+	sub EVT_STC_START_DRAG($$$)        { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_START_DRAG,        $_[2] ) }
+	sub EVT_STC_DRAG_OVER($$$)         { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_DRAG_OVER,         $_[2] ) }
+	sub EVT_STC_DO_DROP($$$)           { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_DO_DROP,           $_[2] ) }
+	sub EVT_STC_ZOOM($$$)              { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_ZOOM,              $_[2] ) }
+	sub EVT_STC_HOTSPOT_CLICK($$$)     { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_HOTSPOT_CLICK,     $_[2] ) }
+	sub EVT_STC_HOTSPOT_DCLICK($$$)    { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_HOTSPOT_DCLICK,    $_[2] ) }
+	sub EVT_STC_CALLTIP_CLICK($$$)     { $_[0]->Connect( $_[1], -1, &Wx::wxEVT_STC_CALLTIP_CLICK,     $_[2] ) }
+}
 
 1; # The end of Wx::Scintilla? :)
 
@@ -201,11 +207,15 @@ On Debian/Ubuntu, you need to install the following via:
 
 	sudo apt-get install libgtk2.0-dev
 
+On MacOS 64-bit by default you need to install a 32-bit Perl in order to
+install wxWidgets 2.8.x. Please refer to 
+L<http://wiki.wxperl.info/w/index.php/Mac_OS_X_Platform_Notes> for more information.
+
 =head1 HISTORY
 
-wxWidgets 2.9.1 and trunk has 2.03 so far. I searched for Perl lexer changes
-in scintilla history and here is what we will be getting when we upgrade to 
-2.20+
+wxWidgets 2.9.1 and development have Scintilla 2.03 so far. I searched for Perl lexer
+changes in scintilla history and here is what we will be getting when we upgrade to
+2.20+.
 
 =over
 
@@ -276,7 +286,8 @@ For other issues, contact the maintainer.
 =head1 AUTHOR
 
 Ahmad M. Zawawi <ahmad.zawawi@gmail.com>
-Mark Dootson
+
+Mark Dootson <http://www.wxperl.co.uk>
 
 =head1 SEE ALSO
 
@@ -290,8 +301,5 @@ Copyright 2011 Ahmad M. Zawawi.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
-
-The full text of the license can be found in the
-LICENSE file included with this module.
 
 =cut
