@@ -5,28 +5,11 @@ use strict;
 use warnings;
 use Wx;
 
-our $VERSION = '0.13';
-
-# Add Wx::Scintilla distribution directory to PATH on windows so that Wx can load it
-my $wx_scintilla_path;
-if ( $ENV{HARNESS_ACTIVE} ) {
-	$wx_scintilla_path = './blib/arch/auto/Wx/Scintilla/';
-} else {
-	eval { require File::ShareDir; $wx_scintilla_path = File::ShareDir::dist_dir('Wx-Scintilla'); 1; };
-	if ($@) {
-
-		# fallback
-		$wx_scintilla_path = './blib/arch/auto/Wx/Scintilla/';
-	}
-}
-$ENV{PATH} = $wx_scintilla_path . ';' . $ENV{PATH} if ( $^O eq 'MSWin32' );
+our $VERSION = '0.14';
 
 # Define Perl 6 lexer
 use constant wxSCINTILLA_LEX_PERL6 => 98;
 
-# Load scintilla's DLL through Wx and ask XSLoader to load it
-# NOTE: Do not use Wx::boot since it is buggy and causes test suite to fail while upgrading
-Wx::load_dll('scintilla');
 require XSLoader;
 XSLoader::load 'Wx::Scintilla', $VERSION;
 
@@ -37,11 +20,11 @@ XSLoader::load 'Wx::Scintilla', $VERSION;
 no strict;
 
 package Wx::ScintillaTextCtrl;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 @ISA = qw(Wx::Control);
 
 package Wx::ScintillaTextEvent;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 @ISA = qw(Wx::CommandEvent);
 
 #Defeat the indexer by splitting the package declaration on two lines
@@ -197,6 +180,10 @@ The ambitious goal of this project is to provide fresh Perl 5 and maybe 6
 support in L<Wx> while preserving compatibility with Wx::StyledTextCtrl
 and continually contribute it back to Scintilla project.
 
+=head1 MANUAL
+
+If you are looking for more API documentation, please consult L<Wx::Scintilla::Manual>
+
 =head1 PLATFORMS
 
 At the moment, Linux (Debian, Ubuntu, Fedora, CentOS) and Windows (Strawberry
@@ -291,15 +278,25 @@ Mark Dootson <http://www.wxperl.co.uk>
 
 =head1 SEE ALSO
 
+Wx::Scintilla Manual L<Wx::Scintilla::Manual>
+
 wxStyledTextCtrl Documentation L<http://www.yellowbrain.com/stc/index.html>
 
 Scintilla edit control for Win32::GUI L<Win32::GUI::Scintilla>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
 Copyright 2011 Ahmad M. Zawawi.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
+
+License for Scintilla
+
+Included Scintilla source is copyrighted 1998-2011 by Neil Hodgson <neilh@scintilla.org>
+
+Permission to use, copy, modify, and distribute this software and its documentation for any purpose and without fee is hereby granted, provided that the above copyright notice appear in all copies and that both that copyright notice and this permission notice appear in supporting documentation.
+
+NEIL HODGSON DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL NEIL HODGSON BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 =cut
