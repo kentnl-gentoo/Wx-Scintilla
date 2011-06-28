@@ -377,11 +377,11 @@ bool ScintillaWX::HaveMouseCapture() {
 
 
 void ScintillaWX::ScrollText(int linesToMove) {
-    int dy = vs.lineHeight * (linesToMove);
     // See http://trac.wxwidgets.org/ticket/13229#comment:3
 #ifdef __WXGTK__    
     stc->Refresh();
 #else
+    int dy = vs.lineHeight * (linesToMove);
     stc->ScrollWindow(0, dy);
     stc->Update();
 #endif
@@ -641,7 +641,7 @@ void ScintillaWX::UpdateSystemCaret() {
 bool ScintillaWX::HasCaretSizeChanged() {
 #ifdef __WXMSW__
     if (( (0 != vs.caretWidth) && (sysCaretWidth != vs.caretWidth) )
-        || (0 != vs.lineHeight) && (sysCaretHeight != vs.lineHeight)) {
+        || ((0 != vs.lineHeight) && (sysCaretHeight != vs.lineHeight))) {
         return true;
     }
 #endif
