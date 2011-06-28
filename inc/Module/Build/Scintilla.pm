@@ -157,10 +157,15 @@ sub _run_command {
 	my $cmds = shift;
 
 	my $cmd = join( ' ', @$cmds );
-	$self->log_info("$cmd\n");
+	if ( !$self->verbose and $cmd =~ /(cc|gcc|g\+\+|cl).+-o\s+(\S+)/ ) {
+		my $object_name = File::Basename::basename($2);
+		$self->log_info("    CC -o $object_name\n");
+	} else {
+		$self->log_info("$cmd\n");
+	}
 	my $rc = system($cmd);
-	die "Failed with exit code $rc" if $rc != 0;
-	die "Ctrl-C interrupted command\n" if $rc & 127;
+	die "Failed with exit code $rc\n$cmd\n"  if $rc != 0;
+	die "Ctrl-C interrupted command\n$cmd\n" if $rc & 127;
 }
 
 sub build_scintilla {
