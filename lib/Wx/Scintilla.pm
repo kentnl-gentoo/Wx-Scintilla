@@ -5,7 +5,7 @@ use warnings;
 use Wx;
 use Carp;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 # Define Perl 6 lexer
 use constant wxSCINTILLA_LEX_PERL6 => 98;
@@ -25,11 +25,11 @@ XSLoader::load 'Wx::Scintilla', $VERSION;
 no strict;
 
 package Wx::ScintillaTextCtrl;
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 @ISA = qw(Wx::Control);
 
 package Wx::ScintillaTextEvent;
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 @ISA = qw(Wx::CommandEvent);
 
 #Defeat the indexer by splitting the package declaration on two lines
@@ -82,7 +82,7 @@ __END__
 
 =head1 NAME
 
-Wx::Scintilla - wxWidgets Perl XS wrapper for the Scintilla editor component
+Wx::Scintilla - Scintilla source code editing component for wxWidgets
 
 =head1 SYNOPSIS
 
