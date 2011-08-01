@@ -5,7 +5,7 @@ use warnings;
 use Wx;
 use Carp;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 # Define Perl 6 lexer
 use constant wxSCINTILLA_LEX_PERL6 => 98;
@@ -25,11 +25,11 @@ XSLoader::load 'Wx::Scintilla', $VERSION;
 no strict;
 
 package Wx::ScintillaTextCtrl;
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 @ISA = qw(Wx::Control);
 
 package Wx::ScintillaTextEvent;
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 @ISA = qw(Wx::CommandEvent);
 
 #Defeat the indexer by splitting the package declaration on two lines
@@ -188,6 +188,10 @@ and continually contribute it back to Scintilla project.
 Note: You cannot load Wx::STC and Wx::Scintilla in the same application. They
 are mutually exclusive. The wxSTC_... events are handled by one library or
 the other.
+
+You can enable experimental building of scintilla 2.03 via the following command:
+
+    perl Build.PL --stc2
 
 =head1 MANUAL
 
