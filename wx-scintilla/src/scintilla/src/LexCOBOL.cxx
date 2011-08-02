@@ -10,18 +10,21 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <assert.h>
+#include <ctype.h>
 
-#include "Platform.h"
-
-#include "PropSet.h"
-#include "Accessor.h"
-#include "KeyWords.h"
+#include "ILexer.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
+
+#include "WordList.h"
+#include "LexAccessor.h"
+#include "Accessor.h"
 #include "StyleContext.h"
+#include "CharacterSet.h"
+#include "LexerModule.h"
 
 #ifdef SCI_NAMESPACE
 using namespace Scintilla;
@@ -90,11 +93,11 @@ static int classifyWordCOBOL(unsigned int start, unsigned int end, /*WordList &k
     getRange(start, end, styler, s, sizeof(s));
 
     char chAttr = SCE_C_IDENTIFIER;
-    if (isdigit(s[0]) || (s[0] == '.')) {
+    if (isdigit(s[0]) || (s[0] == '.') || (s[0] == 'v')) {
         chAttr = SCE_C_NUMBER;
 		char *p = s + 1;
 		while (*p) {
-			if (!isdigit(*p) && isCOBOLwordchar(*p)) {
+			if ((!isdigit(*p) && (*p) != 'v') && isCOBOLwordchar(*p)) {
 				chAttr = SCE_C_IDENTIFIER;
 			    break;
 			}
@@ -202,9 +205,17 @@ static void ColouriseCOBOLDoc(unsigned int startPos, int length, int initStyle, 
         }
 
         if (state == SCE_C_DEFAULT) {
-            if (isCOBOLwordstart(ch) || (ch == '$' && isalpha(chNext))) {
+            if (isCOBOLwordstart(ch) || (ch == '$' && isascii(chNext) && isalpha(chNext))) {
                 ColourTo(styler, i-1, state);
                 state = SCE_C_IDENTIFIER;
+            } else if (column == 6 && ch == '*') {
+            // Cobol comment line: asterisk in column 7.
+                ColourTo(styler, i-1, state);
+                state = SCE_C_COMMENTLINE;
+            } else if (ch == '*' && chNext == '>') {
+            // Cobol inline comment: asterisk, followed by greater than.
+                ColourTo(styler, i-1, state);
+                state = SCE_C_COMMENTLINE;
             } else if (column == 0 && ch == '*' && chNext != '*') {
                 ColourTo(styler, i-1, state);
                 state = SCE_C_COMMENTLINE;

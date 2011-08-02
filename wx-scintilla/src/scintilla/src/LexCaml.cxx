@@ -20,18 +20,22 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <assert.h>
+#include <ctype.h>
 
-#include "Platform.h"
-
-#include "PropSet.h"
-#include "Accessor.h"
-#include "StyleContext.h"
-#include "KeyWords.h"
+#include "ILexer.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
+
+#include "PropSetSimple.h"
+#include "WordList.h"
+#include "LexAccessor.h"
+#include "Accessor.h"
+#include "StyleContext.h"
+#include "CharacterSet.h"
+#include "LexerModule.h"
 
 //	Since the Microsoft __iscsym[f] funcs are not ANSI...
 inline int  iscaml(int c) {return isalnum(c) || c == '_';}
@@ -50,8 +54,12 @@ using namespace Scintilla;
 /*
 	(actually seems to work!)
 */
+#include <string>
 #include "WindowAccessor.h"
 #include "ExternalLexer.h"
+
+#undef EXT_LEXER_DECL
+#define EXT_LEXER_DECL __declspec( dllexport ) __stdcall
 
 #if PLAT_WIN
 #include <windows.h>
@@ -143,7 +151,7 @@ static void InternalLexOrFold(int foldOrLex, unsigned int startPos, int length,
 	int initStyle, char *words[], WindowID window, char *props)
 {
 	// create and initialize a WindowAccessor (including contained PropSet)
-	PropSet ps;
+	PropSetSimple ps;
 	ps.SetMultiple(props);
 	WindowAccessor wa(window, ps);
 	// create and initialize WordList(s)
@@ -429,13 +437,11 @@ void ColouriseCamlDoc(
 static
 #endif	/* BUILD_AS_EXTERNAL_LEXER */
 void FoldCamlDoc(
-	unsigned int startPos, int length,
-	int initStyle,
-	WordList *keywordlists[],
-	Accessor &styler)
+	unsigned int, int,
+	int,
+	WordList *[],
+	Accessor &)
 {
-	// below useless evaluation(s) to supress "not used" warnings
-	startPos || length || initStyle || keywordlists[0] || styler.Length();
 }
 
 static const char * const camlWordListDesc[] = {

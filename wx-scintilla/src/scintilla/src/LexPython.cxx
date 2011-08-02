@@ -7,25 +7,28 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <assert.h>
+#include <ctype.h>
 
-#include "Platform.h"
-
-#include "PropSet.h"
-#include "Accessor.h"
-#include "StyleContext.h"
-#include "KeyWords.h"
+#include "ILexer.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
+
+#include "WordList.h"
+#include "LexAccessor.h"
+#include "Accessor.h"
+#include "StyleContext.h"
+#include "CharacterSet.h"
+#include "LexerModule.h"
 
 #ifdef SCI_NAMESPACE
 using namespace Scintilla;
 #endif
 
 /* kwCDef, kwCTypeName only used for Cython */
-enum kwType { kwOther, kwClass, kwDef, kwImport, kwCDef, kwCTypeName };
+enum kwType { kwOther, kwClass, kwDef, kwImport, kwCDef, kwCTypeName, kwCPDef };
 
 static const int indicatorWhitespace = 1;
 
@@ -36,7 +39,7 @@ static bool IsPyComment(Accessor &styler, int pos, int len) {
 enum literalsAllowed { litNone=0, litU=1, litB=2};
 
 static bool IsPyStringTypeChar(int ch, literalsAllowed allowed) {
-	return 
+	return
 		((allowed & litB) && (ch == 'b' || ch == 'B')) ||
 		((allowed & litU) && (ch == 'u' || ch == 'U'));
 }
@@ -136,13 +139,13 @@ static void ColourisePyDoc(unsigned int startPos, int length, int initStyle,
 	WordList &keywords2 = *keywordlists[1];
 
 	// property tab.timmy.whinge.level
-	//	For Python code, checks whether indenting is consistent. 
-	//	The default, 0 turns off indentation checking, 
-	//	1 checks whether each line is potentially inconsistent with the previous line, 
-	//	2 checks whether any space characters occur before a tab character in the indentation, 
-	//	3 checks whether any spaces are in the indentation, and 
+	//	For Python code, checks whether indenting is consistent.
+	//	The default, 0 turns off indentation checking,
+	//	1 checks whether each line is potentially inconsistent with the previous line,
+	//	2 checks whether any space characters occur before a tab character in the indentation,
+	//	3 checks whether any spaces are in the indentation, and
 	//	4 checks for any tab characters in the indentation.
-	//	1 is a good level to use. 
+	//	1 is a good level to use.
 	const int whingeLevel = styler.GetPropertyInt("tab.timmy.whinge.level");
 
 	// property lexer.python.literals.binary
@@ -157,6 +160,15 @@ static void ColourisePyDoc(unsigned int startPos, int length, int initStyle,
 	//	Set to 0 to not recognise Python 3 bytes literals b"x".
 	if (styler.GetPropertyInt("lexer.python.strings.b", 1))
 		allowedLiterals = static_cast<literalsAllowed>(allowedLiterals | litB);
+
+	// property lexer.python.strings.over.newline
+	//      Set to 1 to allow strings to span newline characters.
+	bool stringsOverNewline = styler.GetPropertyInt("lexer.python.strings.over.newline") != 0;
+
+	// property lexer.python.keywords2.no.sub.identifiers
+	//	When enabled, it will not style keywords2 items that are used as a sub-identifier.
+	//      Example: when set, will not highlight "foo.open" when "open" is a keywords2 item.
+	const bool keywords2NoSubIdentifiers = styler.GetPropertyInt("lexer.python.keywords2.no.sub.identifiers") != 0;
 
 	initStyle = initStyle & 31;
 	if (initStyle == SCE_P_STRINGEOL) {
@@ -204,7 +216,7 @@ static void ColourisePyDoc(unsigned int startPos, int length, int initStyle,
 			}
 			lineCurrent++;
 			if ((sc.state == SCE_P_STRING) || (sc.state == SCE_P_CHARACTER)) {
-				if (inContinuedString) {
+				if (inContinuedString || stringsOverNewline) {
 					inContinuedString = false;
 				} else {
 					sc.ChangeState(SCE_P_STRINGEOL);
@@ -239,7 +251,7 @@ static void ColourisePyDoc(unsigned int startPos, int length, int initStyle,
 					style = SCE_P_CLASSNAME;
 				} else if (kwLast == kwDef) {
 					style = SCE_P_DEFNAME;
-				} else if (kwLast == kwCDef) {
+				} else if (kwLast == kwCDef || kwLast == kwCPDef) {
 					int pos = sc.currentPos;
 					unsigned char ch = styler.SafeGetCharAt(pos, '\0');
 					while (ch != '\0') {
@@ -257,7 +269,16 @@ static void ColourisePyDoc(unsigned int startPos, int length, int initStyle,
 						}
 					}
 				} else if (keywords2.InList(s)) {
-					style = SCE_P_WORD2;
+					if (keywords2NoSubIdentifiers) {
+						// We don't want to highlight keywords2
+						// that are used as a sub-identifier,
+						// i.e. not open in "foo.open".
+						int pos = styler.GetStartSegment() - 1;
+						if (pos < 0 || (styler.SafeGetCharAt(pos, '\0') != '.'))
+							style = SCE_P_WORD2;
+					} else {
+						style = SCE_P_WORD2;
+					}
 				}
 				sc.ChangeState(style);
 				sc.SetState(SCE_P_DEFAULT);
@@ -270,11 +291,13 @@ static void ColourisePyDoc(unsigned int startPos, int length, int initStyle,
 						kwLast = kwImport;
 					else if (0 == strcmp(s, "cdef"))
 						kwLast = kwCDef;
+					else if (0 == strcmp(s, "cpdef"))
+						kwLast = kwCPDef;
 					else if (0 == strcmp(s, "cimport"))
 						kwLast = kwImport;
-					else if (kwLast != kwCDef)
+					else if (kwLast != kwCDef && kwLast != kwCPDef)
 						kwLast = kwOther;
-				} else if (kwLast != kwCDef) {
+				} else if (kwLast != kwCDef && kwLast != kwCPDef) {
 					kwLast = kwOther;
 				}
 			}
@@ -330,8 +353,8 @@ static void ColourisePyDoc(unsigned int startPos, int length, int initStyle,
 			indentGood = true;
 		}
 
-		// One cdef line, clear kwLast only at end of line
-		if (kwLast == kwCDef && sc.atLineEnd) {
+		// One cdef or cpdef line, clear kwLast only at end of line
+		if ((kwLast == kwCDef || kwLast == kwCPDef) && sc.atLineEnd) {
 			kwLast = kwOther;
 		}
 
@@ -349,7 +372,7 @@ static void ColourisePyDoc(unsigned int startPos, int length, int initStyle,
 				if (sc.ch == '0' && (sc.chNext == 'x' || sc.chNext == 'X')) {
 					base_n_number = true;
 					sc.SetState(SCE_P_NUMBER);
-				} else if (sc.ch == '0' && 
+				} else if (sc.ch == '0' &&
 					(sc.chNext == 'o' || sc.chNext == 'O' || sc.chNext == 'b' || sc.chNext == 'B')) {
 					if (base2or8Literals) {
 						base_n_number = true;
@@ -405,16 +428,14 @@ static bool IsQuoteLine(int line, Accessor &styler) {
 static void FoldPyDoc(unsigned int startPos, int length, int /*initStyle - unused*/,
                       WordList *[], Accessor &styler) {
 	const int maxPos = startPos + length;
-	const int maxLines = styler.GetLine(maxPos - 1);             // Requested last line
-	const int docLines = styler.GetLine(styler.Length() - 1);  // Available last line
-
-	// property fold.comment.python
-	//	This option enables folding multi-line comments when using the Python lexer.
-	const bool foldComment = styler.GetPropertyInt("fold.comment.python") != 0;
+	const int maxLines = (maxPos == styler.Length()) ? styler.GetLine(maxPos) : styler.GetLine(maxPos - 1);	// Requested last line
+	const int docLines = styler.GetLine(styler.Length());	// Available last line
 
 	// property fold.quotes.python
 	//	This option enables folding multi-line quoted strings when using the Python lexer.
 	const bool foldQuotes = styler.GetPropertyInt("fold.quotes.python") != 0;
+
+	const bool foldCompact = styler.GetPropertyInt("fold.compact") != 0;
 
 	// Backtrack to previous non-blank line so we can determine indent level
 	// for any white space lines (needed esp. within triple quoted strings)
@@ -439,14 +460,11 @@ static void FoldPyDoc(unsigned int startPos, int length, int /*initStyle - unuse
 	if (lineCurrent >= 1)
 		prev_state = styler.StyleAt(startPos - 1) & 31;
 	int prevQuote = foldQuotes && ((prev_state == SCE_P_TRIPLE) || (prev_state == SCE_P_TRIPLEDOUBLE));
-	int prevComment = 0;
-	if (lineCurrent >= 1)
-		prevComment = foldComment && IsCommentLine(lineCurrent - 1, styler);
 
 	// Process all characters to end of requested range or end of any triple quote
-	// or comment that hangs over the end of the range.  Cap processing in all cases
-	// to end of document (in case of unclosed quote or comment at end).
-	while ((lineCurrent <= docLines) && ((lineCurrent <= maxLines) || prevQuote || prevComment)) {
+	//that hangs over the end of the range.  Cap processing in all cases
+	// to end of document (in case of unclosed quote at end).
+	while ((lineCurrent <= docLines) && ((lineCurrent <= maxLines) || prevQuote)) {
 
 		// Gather info
 		int lev = indentCurrent;
@@ -456,16 +474,13 @@ static void FoldPyDoc(unsigned int startPos, int length, int /*initStyle - unuse
 		if (lineNext <= docLines) {
 			// Information about next line is only available if not at end of document
 			indentNext = styler.IndentAmount(lineNext, &spaceFlags, NULL);
-			int style = styler.StyleAt(styler.LineStart(lineNext)) & 31;
+			int lookAtPos = (styler.LineStart(lineNext) == styler.Length()) ? styler.Length() - 1 : styler.LineStart(lineNext);
+			int style = styler.StyleAt(lookAtPos) & 31;
 			quote = foldQuotes && ((style == SCE_P_TRIPLE) || (style == SCE_P_TRIPLEDOUBLE));
 		}
 		const int quote_start = (quote && !prevQuote);
 		const int quote_continue = (quote && prevQuote);
-		const int comment = foldComment && IsCommentLine(lineCurrent, styler);
-		const int comment_start = (comment && !prevComment && (lineNext <= docLines) &&
-		                           IsCommentLine(lineNext, styler) && (lev > SC_FOLDLEVELBASE));
-		const int comment_continue = (comment && prevComment);
-		if ((!quote || !prevQuote) && !comment)
+		if (!quote || !prevQuote)
 			indentCurrentLevel = indentCurrent & SC_FOLDLEVELNUMBERMASK;
 		if (quote)
 			indentNext = indentCurrentLevel;
@@ -477,12 +492,6 @@ static void FoldPyDoc(unsigned int startPos, int length, int /*initStyle - unuse
 			lev |= SC_FOLDLEVELHEADERFLAG;
 		} else if (quote_continue || prevQuote) {
 			// Add level to rest of lines in the string
-			lev = lev + 1;
-		} else if (comment_start) {
-			// Place fold point at start of a block of comments
-			lev |= SC_FOLDLEVELHEADERFLAG;
-		} else if (comment_continue) {
-			// Add level to rest of lines in the block
 			lev = lev + 1;
 		}
 
@@ -501,7 +510,7 @@ static void FoldPyDoc(unsigned int startPos, int length, int /*initStyle - unuse
 		}
 
 		const int levelAfterComments = indentNext & SC_FOLDLEVELNUMBERMASK;
-		const int levelBeforeComments = Platform::Maximum(indentCurrentLevel,levelAfterComments);
+		const int levelBeforeComments = Maximum(indentCurrentLevel,levelAfterComments);
 
 		// Now set all the indent levels on the lines we skipped
 		// Do this from end to start.  Once we encounter one line
@@ -514,26 +523,34 @@ static void FoldPyDoc(unsigned int startPos, int length, int /*initStyle - unuse
 		while (--skipLine > lineCurrent) {
 			int skipLineIndent = styler.IndentAmount(skipLine, &spaceFlags, NULL);
 
-			if ((skipLineIndent & SC_FOLDLEVELNUMBERMASK) > levelAfterComments)
-				skipLevel = levelBeforeComments;
+			if (foldCompact) {
+				if ((skipLineIndent & SC_FOLDLEVELNUMBERMASK) > levelAfterComments)
+					skipLevel = levelBeforeComments;
 
-			int whiteFlag = skipLineIndent & SC_FOLDLEVELWHITEFLAG;
+				int whiteFlag = skipLineIndent & SC_FOLDLEVELWHITEFLAG;
 
-			styler.SetLevel(skipLine, skipLevel | whiteFlag);
+				styler.SetLevel(skipLine, skipLevel | whiteFlag);
+			} else {
+				if ((skipLineIndent & SC_FOLDLEVELNUMBERMASK) > levelAfterComments &&
+					!(skipLineIndent & SC_FOLDLEVELWHITEFLAG) &&
+					!IsCommentLine(skipLine, styler))
+					skipLevel = levelBeforeComments;
+
+				styler.SetLevel(skipLine, skipLevel);
+			}
 		}
 
-		// Set fold header on non-quote/non-comment line
-		if (!quote && !comment && !(indentCurrent & SC_FOLDLEVELWHITEFLAG) ) {
+		// Set fold header on non-quote line
+		if (!quote && !(indentCurrent & SC_FOLDLEVELWHITEFLAG)) {
 			if ((indentCurrent & SC_FOLDLEVELNUMBERMASK) < (indentNext & SC_FOLDLEVELNUMBERMASK))
 				lev |= SC_FOLDLEVELHEADERFLAG;
 		}
 
-		// Keep track of triple quote and block comment state of previous line
+		// Keep track of triple quote state of previous line
 		prevQuote = quote;
-		prevComment = comment_start || comment_continue;
 
 		// Set fold level for this line and move to next line
-		styler.SetLevel(lineCurrent, lev);
+		styler.SetLevel(lineCurrent, foldCompact ? lev : lev & ~SC_FOLDLEVELWHITEFLAG);
 		indentCurrent = indentNext;
 		lineCurrent = lineNext;
 	}
@@ -543,7 +560,7 @@ static void FoldPyDoc(unsigned int startPos, int length, int /*initStyle - unuse
 	//styler.SetLevel(lineCurrent, indentCurrent);
 }
 
-static const char * const pythonWordListDesc[] = {
+static const char *const pythonWordListDesc[] = {
 	"Keywords",
 	"Highlighted identifiers",
 	0

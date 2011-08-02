@@ -7,30 +7,36 @@
 // Copyright 2003 by Marius Gheorghe <mgheorghe@cabletest.com>
 // The License.txt file describes the conditions under which this software may be distributed.
 
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include "Platform.h"
+#include <stdarg.h>
+#include <assert.h>
 
-#include "PropSet.h"
-#include "Accessor.h"
-#include "KeyWords.h"
+#include <string>
+
+#include "ILexer.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
-#include "SString.h"
+
+#include "WordList.h"
+#include "LexAccessor.h"
+#include "Accessor.h"
+#include "StyleContext.h"
+#include "CharacterSet.h"
+#include "LexerModule.h"
 
 #ifdef SCI_NAMESPACE
 using namespace Scintilla;
 #endif
 
-static int GetLotLineState(SString &line) {
+static int GetLotLineState(std::string &line) {
 	if (line.length()) {
 		// Most of the time the first non-blank character in line determines that line's type
 		// Now finds the first non-blank character
 		unsigned i; // Declares counter here to make it persistent after the for loop
 		for (i = 0; i < line.length(); ++i) {
-			if (!isspace(line[i]))
+			if (!(isascii(line[i]) && isspace(line[i])))
 				break;
 		}
 
@@ -54,17 +60,17 @@ static int GetLotLineState(SString &line) {
 
 		default:  // Any other line
 			// Checks for message at the end of lot file
-			if (line.contains("PASSED")) {
+			if (line.find("PASSED") != std::string::npos) {
 				return SCE_LOT_PASS;
 			}
-			else if (line.contains("FAILED")) {
+			else if (line.find("FAILED") != std::string::npos) {
 				return SCE_LOT_FAIL;
 			}
-			else if (line.contains("ABORTED")) {
+			else if (line.find("ABORTED") != std::string::npos) {
 				return SCE_LOT_ABORT;
 			}
 			else {
-				return i ? SCE_LOT_PASS : SCE_LOT_DEFAULT;			
+				return i ? SCE_LOT_PASS : SCE_LOT_DEFAULT;
 			}
 		}
 	}
@@ -78,8 +84,8 @@ static void ColourizeLotDoc(unsigned int startPos, int length, int, WordList *[]
 	styler.StartSegment(startPos);
 	bool atLineStart = true;// Arms the 'at line start' flag
 	char chNext = styler.SafeGetCharAt(startPos);
-	SString line("");
-	line.setsizegrowth(256);	// Lot lines are less than 256 chars long most of the time. This should avoid reallocations
+	std::string line("");
+	line.reserve(256);	// Lot lines are less than 256 chars long most of the time. This should avoid reallocations
 
 	// Styles LOT document
 	unsigned int i;			// Declared here because it's used after the for loop
@@ -133,10 +139,10 @@ static void FoldLotDoc(unsigned int startPos, int length, int, WordList *[], Acc
 		if (ch == '\r' && chNext == '\n') {
 			// TO DO:
 			// Should really get the state of the previous line from the styler
-			int stylePrev = style;	
+			int stylePrev = style;
 			style = styleNext;
 			styleNext = styler.StyleAt(i + 2);
-		
+
 			switch (style) {
 /*
 			case SCE_LOT_SET:
@@ -145,7 +151,7 @@ static void FoldLotDoc(unsigned int startPos, int length, int, WordList *[], Acc
 */
 			case SCE_LOT_FAIL:
 /*
-				if (stylePrev != SCE_LOT_FAIL) 
+				if (stylePrev != SCE_LOT_FAIL)
 					lev = SC_FOLDLEVELBASE | SC_FOLDLEVELHEADERFLAG;
 				else
 					lev = SC_FOLDLEVELBASE + 1;
@@ -154,7 +160,7 @@ static void FoldLotDoc(unsigned int startPos, int length, int, WordList *[], Acc
 				break;
 
 			default:
-				if (lineCurrent == 0 || stylePrev == SCE_LOT_FAIL) 
+				if (lineCurrent == 0 || stylePrev == SCE_LOT_FAIL)
 					lev = SC_FOLDLEVELBASE | SC_FOLDLEVELHEADERFLAG;
 				else
 					lev = SC_FOLDLEVELBASE + 1;
@@ -164,7 +170,7 @@ static void FoldLotDoc(unsigned int startPos, int length, int, WordList *[], Acc
 				break;
 			}
 
-			if (lev != styler.LevelAt(lineCurrent)) 
+			if (lev != styler.LevelAt(lineCurrent))
 				styler.SetLevel(lineCurrent, lev);
 
 			lineCurrent++;

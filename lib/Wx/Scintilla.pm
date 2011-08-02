@@ -5,7 +5,7 @@ use warnings;
 use Wx;
 use Carp;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21_01';
 
 # Define Perl 6 lexer
 use constant wxSCINTILLA_LEX_PERL6 => 98;
@@ -25,11 +25,11 @@ XSLoader::load 'Wx::Scintilla', $VERSION;
 no strict;
 
 package Wx::ScintillaTextCtrl;
-our $VERSION = '0.20';
+our $VERSION = '0.21_01';
 @ISA = qw(Wx::Control);
 
 package Wx::ScintillaTextEvent;
-our $VERSION = '0.20';
+our $VERSION = '0.21_01';
 @ISA = qw(Wx::CommandEvent);
 
 #Defeat the indexer by splitting the package declaration on two lines
@@ -189,9 +189,7 @@ Note: You cannot load Wx::STC and Wx::Scintilla in the same application. They
 are mutually exclusive. The wxSTC_... events are handled by one library or
 the other.
 
-You can enable experimental building of scintilla 2.03 via the following command:
-
-    perl Build.PL --stc2
+Scintilla 2.28 is now bundled and enabled by default.
 
 =head1 MANUAL
 
@@ -215,7 +213,7 @@ L<http://wiki.wxperl.info/w/index.php/Mac_OS_X_Platform_Notes> for more informat
 
 wxWidgets 2.9.1 and development have Scintilla 2.03 so far. I searched for Perl lexer
 changes in scintilla history and here is what we will be getting when we upgrade to
-2.20+.
+2.26+.
 
 =over
 
@@ -229,7 +227,7 @@ fold.perl.comment.explicit. Fold structure for Perl fixed.
 Perl folder works for array blocks, adjacent package statements, nested PODs,
 and terminates package folding at DATA, D and Z.
 
-=item Release 1.79 (Currently we're here)
+=item Release 1.79
 
 Perl lexer bug fixed where previous lexical states persisted causing "/" special 
 case styling and subroutine prototype styling to not be correct.

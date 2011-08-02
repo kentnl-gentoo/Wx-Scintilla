@@ -4,9 +4,25 @@
 //                        Robin Dunn <robin@aldunn.com>
 // The License.txt file describes the conditions under which this software may be distributed.
 
+// For compilers that support precompilation, includes "wx.h".
+#include "wx/wxprec.h"
+
+#ifdef __BORLANDC__
+    #pragma hdrstop
+#endif
+
+#ifndef WX_PRECOMP
+    #include "wx/menu.h"
+    #include "wx/dcmemory.h"
+    #include "wx/settings.h"
+#endif // WX_PRECOMP
+
 #include <ctype.h>
 
-#include "wx/wx.h"
+#if wxUSE_DISPLAY
+#include "wx/display.h"
+#endif
+
 #include "wx/encconv.h"
 #include "wx/listctrl.h"
 #include "wx/mstream.h"
@@ -14,11 +30,7 @@
 #include "wx/imaglist.h"
 #include "wx/tokenzr.h"
 
-#if wxUSE_DISPLAY
-#include "wx/display.h"
-#endif
-
-#ifdef wxHAVE_RAW_BITMAP
+#ifdef wxHAS_RAW_BITMAP
 #include "wx/rawbmp.h"
 #endif
 #if wxUSE_GRAPHICS_CONTEXT
@@ -28,7 +40,7 @@
 #include "Platform.h"
 #include "PlatWX.h"
 #include "WxScintilla.h"
-
+#include "private.h"
 
 
 Point Point::FromLong(long lpoint) {
@@ -72,8 +84,7 @@ Palette::Palette() {
 
 Palette::~Palette() {
     Release();
-    delete [] entries;
-    entries = 0;
+    wxDELETEA(entries);
 }
 
 void Palette::Release() {
@@ -134,14 +145,15 @@ Font::Font() {
 Font::~Font() {
 }
 
-void Font::Create(const char *faceName, int characterSet, int size, bool bold, bool italic, bool extraFontFlag) {
-
+void Font::Create(const char *faceName, int characterSet,
+                  int size, bool bold, bool italic,
+                  int WXUNUSED(extraFontFlag)) {
     Release();
 
     // The minus one is done because since Scintilla uses SC_SHARSET_DEFAULT
     // internally and we need to have wxFONENCODING_DEFAULT == SC_SHARSET_DEFAULT
     // so we adjust the encoding before passing it to Scintilla.  See also
-    // wxScintillaTextCtrl::StyleSetCharacterSet
+    // wxStyledTextCtrl::StyleSetCharacterSet
     wxFontEncoding encoding = (wxFontEncoding)(characterSet-1);
 
     wxFontEncodingArray ea = wxEncodingConverter::GetPlatformEquivalents(encoding);
@@ -155,7 +167,6 @@ void Font::Create(const char *faceName, int characterSet, int size, bool bold, b
                     false,
                     stc2wx(faceName),
                     encoding);
-    font->SetNoAntiAliasing(!extraFontFlag);
     fid = font;
 }
 
@@ -199,6 +210,7 @@ public:
     virtual void RoundedRectangle(PRectangle rc, ColourAllocated fore, ColourAllocated back);
     virtual void AlphaRectangle(PRectangle rc, int cornerSize, ColourAllocated fill, int alphaFill,
                                 ColourAllocated outline, int alphaOutline, int flags);
+    virtual void DrawRGBAImage(PRectangle rc, int width, int height, const unsigned char *pixelsImage);
     virtual void Ellipse(PRectangle rc, ColourAllocated fore, ColourAllocated back);
     virtual void Copy(PRectangle rc, Point from, Surface &surfaceSource);
 
@@ -286,11 +298,11 @@ bool SurfaceImpl::Initialised() {
 
 
 void SurfaceImpl::PenColour(ColourAllocated fore) {
-    hdc->SetPen(wxPen(wxColourFromCA(fore), 1, wxSOLID));
+    hdc->SetPen(wxPen(wxColourFromCA(fore)));
 }
 
 void SurfaceImpl::BrushColour(ColourAllocated back) {
-    hdc->SetBrush(wxBrush(wxColourFromCA(back), wxSOLID));
+    hdc->SetBrush(wxBrush(wxColourFromCA(back)));
 }
 
 void SurfaceImpl::SetFont(Font &font_) {
@@ -341,7 +353,7 @@ void SurfaceImpl::FillRectangle(PRectangle rc, Surface &surfacePattern) {
     if (((SurfaceImpl&)surfacePattern).bitmap)
         br = wxBrush(*((SurfaceImpl&)surfacePattern).bitmap);
     else    // Something is wrong so display in red
-        br = wxBrush(*wxRED, wxSOLID);
+        br = wxBrush(*wxRED);
     hdc->SetPen(*wxTRANSPARENT_PEN);
     hdc->SetBrush(br);
     hdc->DrawRectangle(wxRectFromPRectangle(rc));
@@ -372,8 +384,8 @@ void SurfaceImpl::AlphaRectangle(PRectangle rc, int cornerSize,
     dc.DrawRoundedRectangle(wxRectFromPRectangle(rc), cornerSize);
     return;
 #else
-
-#ifdef wxHAVE_RAW_BITMAP
+    
+#ifdef wxHAS_RAW_BITMAP
 
     // TODO:  do something with cornerSize
     wxUnusedVar(cornerSize);
@@ -382,7 +394,6 @@ void SurfaceImpl::AlphaRectangle(PRectangle rc, int cornerSize,
     wxRect r = wxRectFromPRectangle(rc);
     wxBitmap bmp(r.width, r.height, 32);
     wxAlphaPixelData pixData(bmp);
-    pixData.UseAlpha();
 
     // Set the fill pixels
     ColourDesired cdf(fill.AsLong());
@@ -443,6 +454,11 @@ void SurfaceImpl::AlphaRectangle(PRectangle rc, int cornerSize,
     RectangleDraw(rc, outline, fill);
 #endif
 #endif
+}
+
+//TODO implement SurfaceImpl::DrawRGBAImage
+void SurfaceImpl::DrawRGBAImage(PRectangle rc, int width, int height, const unsigned char *pixelsImage) {
+    printf("RegisterRGBAImage is not implemented! Please contact the author\n");
 }
 
 void SurfaceImpl::Ellipse(PRectangle rc, ColourAllocated fore, ColourAllocated back) {
@@ -684,7 +700,7 @@ void Window::SetFont(Font &font) {
 }
 
 void Window::SetCursor(Cursor curs) {
-    int cursorId;
+    wxStockCursor cursorId;
 
     switch (curs) {
     case cursorText:
@@ -715,22 +731,20 @@ void Window::SetCursor(Cursor curs) {
         cursorId = wxCURSOR_ARROW;
         break;
     }
-#ifdef __WXMOTIF__
-       wxCursor wc = wxStockCursor(cursorId) ;
-#else
-       wxCursor wc = wxCursor(cursorId) ;
-#endif
-       if(curs != cursorLast)
-       {
-           GETWIN(wid)->SetCursor(wc);
-           cursorLast = curs;
-       }
+
+    wxCursor wc = wxCursor(cursorId);
+    if(curs != cursorLast)
+    {
+        GETWIN(wid)->SetCursor(wc);
+        cursorLast = curs;
+    }
 }
 
 
 void Window::SetTitle(const char *s) {
     GETWIN(wid)->SetLabel(stc2wx(s));
 }
+
 
 // Returns rectangle of monitor pt is on
 PRectangle Window::GetMonitorRect(Point pt) {
@@ -809,16 +823,7 @@ END_EVENT_TABLE()
 
 
 #if wxUSE_POPUPWIN //-----------------------------------
-#include <wx/popupwin.h>
-
-
-//
-// TODO: Refactor these two classes to have a common base (or a mix-in) to get
-// rid of the code duplication.  (Either that or convince somebody to
-// implement wxPopupWindow for the Mac!!)
-//
-// In the meantime, be careful to duplicate any changes as needed...
-//
+#include "wx/popupwin.h"
 
 // A popup window to place the wxSTCListBox upon
 class wxSTCListBoxWin : public wxPopupWindow
@@ -829,10 +834,8 @@ private:
     void*               doubleClickActionData;
 public:
     wxSTCListBoxWin(wxWindow* parent, wxWindowID id, Point WXUNUSED(location)) :
-        wxPopupWindow(parent, wxBORDER_NONE)
+        wxPopupWindow(parent, wxBORDER_SIMPLE)
     {
-
-        SetBackgroundColour(*wxBLACK);  // for our simple border
 
         lv = new wxSTCListBox(parent, id, wxPoint(-50,-50), wxDefaultSize,
                               wxLC_REPORT | wxLC_SINGLE_SEL | wxLC_NO_HEADER | wxBORDER_NONE);
@@ -907,11 +910,9 @@ public:
     }
 
     void OnSize(wxSizeEvent& event) {
-        // resize the child
-        wxSize sz = GetSize();
-        sz.x -= 2;
-        sz.y -= 2;
-        lv->SetSize(1, 1, sz.x, sz.y);
+        // resize the child to fill the popup
+        wxSize sz = GetClientSize();
+        lv->SetSize(0, 0, sz.x, sz.y);
         // reset the column widths
         lv->SetColumnWidth(0, IconWidth()+4);
         lv->SetColumnWidth(1, sz.x - 2 - lv->GetColumnWidth(0) -
@@ -939,6 +940,7 @@ END_EVENT_TABLE()
 
 
 #else // !wxUSE_POPUPWIN -----------------------------------
+#include "wx/frame.h"
 
 // A normal window to place the wxSTCListBox upon, but make it behave as much
 // like a wxPopupWindow as possible
@@ -1131,6 +1133,7 @@ public:
     virtual int Find(const char *prefix);
     virtual void GetValue(int n, char *value, int len);
     virtual void RegisterImage(int type, const char *xpm_data);
+    virtual void RegisterRGBAImage(int type, int width, int height, const unsigned char *pixelsImage);
     virtual void ClearRegisteredImages();
     virtual void SetDoubleClickAction(CallBackAction, void *);
     virtual void SetList(const char* list, char separator, char typesep);
@@ -1145,14 +1148,8 @@ ListBoxImpl::ListBoxImpl()
 }
 
 ListBoxImpl::~ListBoxImpl() {
-    if (imgList) {
-        delete imgList;
-        imgList = NULL;
-    }
-    if (imgTypeMap) {
-        delete imgTypeMap;
-        imgTypeMap = NULL;
-    }
+    wxDELETE(imgList);
+    wxDELETE(imgTypeMap);
 }
 
 
@@ -1329,15 +1326,15 @@ void ListBoxImpl::RegisterImage(int type, const char *xpm_data) {
     itm[type] = idx;
 }
 
+//TODO implement ListBoxImpl::RegisterRGBAImage
+void ListBoxImpl::RegisterRGBAImage(int type, int width, int height, const unsigned char *pixelsImage) {
+    printf("RegisterRGBAImage is not implemented! Please contact the author\n");
+}
+
+
 void ListBoxImpl::ClearRegisteredImages() {
-    if (imgList) {
-        delete imgList;
-        imgList = NULL;
-    }
-    if (imgTypeMap) {
-        delete imgTypeMap;
-        imgTypeMap = NULL;
-    }
+    wxDELETE(imgList);
+    wxDELETE(imgTypeMap);
     if (wid)
         GETLB(wid)->SetImageList(NULL, wxIMAGE_LIST_SMALL);
 }
@@ -1475,6 +1472,8 @@ void Platform::DebugPrintf(const char *format, ...) {
     vsprintf(buffer,format,pArguments);
     va_end(pArguments);
     Platform::DebugDisplay(buffer);
+#else
+    wxUnusedVar(format);
 #endif
 }
 

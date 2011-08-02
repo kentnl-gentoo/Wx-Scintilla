@@ -9,13 +9,14 @@
 // Author:      Robin Dunn
 //
 // Created:     13-Jan-2000
-// RCS-ID:      $Id: ScintillaWX.h 55221 2008-08-24 04:06:41Z RD $
+// RCS-ID:      $Id$
 // Copyright:   (c) 2000 by Total Control Software
-// Licence:     wxWindows license
+// Licence:     wxWindows licence
 /////////////////////////////////////////////////////////////////////////////
 
 #ifndef __ScintillaWX_h__
 #define __ScintillaWX_h__
+#include "wx/defs.h"
 
 //----------------------------------------------------------------------
 
@@ -23,36 +24,49 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <vector>
+#include <map>
 
 #include "Platform.h"
-
-#include "Scintilla.h"
-#include "CharClassify.h"
-#include "XPM.h"
-#ifdef SCI_LEXER
-#include "SciLexer.h"
-#include "PropSet.h"
-#include "Accessor.h"
-#include "KeyWords.h"
-#endif
 #include "SplitVector.h"
 #include "Partitioning.h"
 #include "RunStyles.h"
+#include "Scintilla.h"
+#include "ScintillaWidget.h"
+#ifdef SCI_LEXER
+#include "ILexer.h"
+#include "SciLexer.h"
+#include "LexAccessor.h"
+#include "Accessor.h"
+#include "WordList.h"
+#endif
 #include "ContractionState.h"
 #include "SVector.h"
 #include "CellBuffer.h"
 #include "CallTip.h"
 #include "KeyMap.h"
 #include "Indicator.h"
+#include "XPM.h"
 #include "LineMarker.h"
 #include "Style.h"
-#include "ViewStyle.h"
 #include "AutoComplete.h"
+#include "ViewStyle.h"
+#include "CharClassify.h"
 #include "Decoration.h"
 #include "Document.h"
+#include "Selection.h"
 #include "PositionCache.h"
 #include "Editor.h"
 #include "ScintillaBase.h"
+
+#ifdef __WXMSW__
+#include "wx/msw/wrapwin.h"                     // HBITMAP
+#endif
+#if wxUSE_DRAG_AND_DROP
+#include "wx/timer.h"
+#endif
+
+//----------------------------------------------------------------------
 
 /* Versions before 2.8.11 dont' have wxIntPtr defined */
 
@@ -85,7 +99,10 @@
     #define WXDLLIMPEXP_STC
 #endif
 
-class WXDLLIMPEXP_STC wxScintillaTextCtrl;           // forward
+
+
+class WXDLLIMPEXP_FWD_CORE wxDC;
+class WXDLLIMPEXP_FWD_STC wxScintillaTextCtrl;           // forward
 class ScintillaWX;
 
 
@@ -96,7 +113,7 @@ class ScintillaWX;
 class wxSTCDropTarget : public wxTextDropTarget {
 public:
     void SetScintilla(ScintillaWX* swx) {
-        this->swx = swx;
+        m_swx = swx;
     }
 
     bool OnDropText(wxCoord x, wxCoord y, const wxString& data);
@@ -105,7 +122,7 @@ public:
     void OnLeave();
 
 private:
-    ScintillaWX* swx;
+    ScintillaWX* m_swx;
 };
 #endif
 
@@ -168,7 +185,6 @@ public:
     int  DoKeyDown(const wxKeyEvent& event, bool* consumed);
     void DoTick() { Tick(); }
     void DoOnIdle(wxIdleEvent& evt);
-    void DoStartDrag();
 
 #if wxUSE_DRAG_AND_DROP
     bool DoDropText(long x, long y, const wxString& data);
@@ -200,7 +216,6 @@ private:
 #if wxUSE_DRAG_AND_DROP
     wxSTCDropTarget*    dropTarget;
     wxDragResult        dragResult;
-    wxTimer*            startDragTimer;
 #endif
 
     int                 wheelRotation;

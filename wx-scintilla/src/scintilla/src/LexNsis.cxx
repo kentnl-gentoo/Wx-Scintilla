@@ -5,19 +5,24 @@
 // Copyright 2003 - 2005 by Angelo Mandato <angelo [at] spaceblue [dot] com>
 // Last Updated: 03/13/2005
 // The License.txt file describes the conditions under which this software may be distributed.
+
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <assert.h>
+#include <ctype.h>
 
-#include "Platform.h"
-
-#include "PropSet.h"
-#include "Accessor.h"
-#include "KeyWords.h"
+#include "ILexer.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
+
+#include "WordList.h"
+#include "LexAccessor.h"
+#include "Accessor.h"
+#include "StyleContext.h"
+#include "CharacterSet.h"
+#include "LexerModule.h"
 
 #ifdef SCI_NAMESPACE
 using namespace Scintilla;
@@ -77,7 +82,7 @@ static bool NsisNextLineHasElse(unsigned int start, unsigned int end, Accessor &
     }
   }
 
-  if( nNextLine == -1 ) // We never foudn the next line...
+  if( nNextLine == -1 ) // We never found the next line...
     return false;
 
   for( unsigned int firstChar = nNextLine; firstChar < end; firstChar++ )
@@ -145,7 +150,7 @@ static int calculateFoldNsis(unsigned int start, unsigned int end, int foldlevel
 
   if( s[0] == '!' )
   {
-    if( NsisCmp(s, "!ifndef", bIgnoreCase) == 0 || NsisCmp(s, "!ifdef", bIgnoreCase ) == 0 || NsisCmp(s, "!if", bIgnoreCase ) == 0 || NsisCmp(s, "!macro", bIgnoreCase ) == 0 )
+    if( NsisCmp(s, "!ifndef", bIgnoreCase) == 0 || NsisCmp(s, "!ifdef", bIgnoreCase ) == 0 || NsisCmp(s, "!ifmacrodef", bIgnoreCase ) == 0 || NsisCmp(s, "!ifmacrondef", bIgnoreCase ) == 0 || NsisCmp(s, "!if", bIgnoreCase ) == 0 || NsisCmp(s, "!macro", bIgnoreCase ) == 0 )
       newFoldlevel++;
     else if( NsisCmp(s, "!endif", bIgnoreCase) == 0 || NsisCmp(s, "!macroend", bIgnoreCase ) == 0 )
       newFoldlevel--;
@@ -190,16 +195,16 @@ static int classifyWordNsis(unsigned int start, unsigned int end, WordList *keyw
 	}
 
 	// Check for special words...
-	if( NsisCmp(s, "!macro", bIgnoreCase ) == 0 || NsisCmp(s, "!macroend", bIgnoreCase) == 0 ) // Covers !micro and !microend
+	if( NsisCmp(s, "!macro", bIgnoreCase ) == 0 || NsisCmp(s, "!macroend", bIgnoreCase) == 0 ) // Covers !macro and !macroend
 		return SCE_NSIS_MACRODEF;
 
-	if( NsisCmp(s, "!ifdef", bIgnoreCase ) == 0 ||  NsisCmp(s, "!ifndef", bIgnoreCase) == 0 ||  NsisCmp(s, "!endif", bIgnoreCase) == 0 )
+	if( NsisCmp(s, "!ifdef", bIgnoreCase ) == 0 ||  NsisCmp(s, "!ifndef", bIgnoreCase) == 0 ||  NsisCmp(s, "!endif", bIgnoreCase) == 0 ) // Covers !ifdef, !ifndef and !endif
 		return SCE_NSIS_IFDEFINEDEF;
 
-  if( NsisCmp(s, "!else", bIgnoreCase ) == 0 ) // ||  NsisCmp(s, "!ifndef", bIgnoreCase) == 0 ||  NsisCmp(s, "!endif", bIgnoreCase) == 0 )
+	if( NsisCmp(s, "!if", bIgnoreCase ) == 0 || NsisCmp(s, "!else", bIgnoreCase )  == 0 ) // Covers !if and else
 		return SCE_NSIS_IFDEFINEDEF;
 
-  if( NsisCmp(s, "!if", bIgnoreCase ) == 0 )
+	if (NsisCmp(s, "!ifmacrodef", bIgnoreCase ) == 0 || NsisCmp(s, "!ifmacrondef", bIgnoreCase )  == 0 ) // Covers !ifmacrodef and !ifnmacrodef
 		return SCE_NSIS_IFDEFINEDEF;
 
   if( NsisCmp(s, "SectionGroup", bIgnoreCase) == 0 || NsisCmp(s, "SectionGroupEnd", bIgnoreCase) == 0 ) // Covers SectionGroup and SectionGroupEnd
