@@ -1,8 +1,13 @@
 Revision history for Wx-Scintilla
 
+0.21_03  2011.8.3
+    - Test and install Module::Build actions invoke build first (AZAWAWI)
+    - Build or link like make *only* when one of the output files is not
+      up to date (AZAWAWI)
+
 0.21_02  2011.8.2
-    - Fix OSX compilation error (tome++)
-    - Updated editor.pl to include the perl 5.10 // scintilla test
+    - Fix OSX compilation error (TOME++)
+    - Updated editor.pl to include the perl 5.10 // scintilla test (AZAWAWI)
 
 0.21_01  2011.8.2
     - Upgraded to Scintilla 2.28 which was released on 1st August 2011 (AZAWAWI)
