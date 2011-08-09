@@ -1,5 +1,11 @@
 Revision history for Wx-Scintilla
 
+0.21_04  2011.8.9
+    - The rebirth of the experimental Perl 6 lexer (AZAWAWI)
+    - Expose IndicatorSetAlpha, IndicatorGetAlpha, IndicatorSetUnder
+      and IndicatorGetUnder (AZAWAWI)
+    - Fixed a drawing bug for transparent boxed indicators (AZAWAWI, Reported by ADAMK)
+
 0.21_03  2011.8.3
     - Test and install Module::Build actions invoke build first (AZAWAWI)
     - Build or link like make *only* when one of the output files is not

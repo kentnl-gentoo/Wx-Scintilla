@@ -31,15 +31,15 @@
    "provides" : {
       "Wx::Scintilla" : {
          "file" : "lib/Wx/Scintilla.pm",
-         "version" : "0.21_03"
+         "version" : "0.21_04"
       },
       "Wx::ScintillaTextCtrl" : {
          "file" : "lib/Wx/Scintilla.pm",
-         "version" : "0.21_03"
+         "version" : "0.21_04"
       },
       "Wx::ScintillaTextEvent" : {
          "file" : "lib/Wx/Scintilla.pm",
-         "version" : "0.21_03"
+         "version" : "0.21_04"
       }
    },
    "release_status" : "testing",
@@ -52,5 +52,5 @@
          "url" : "http://svn.perlide.org/padre/trunk/Wx-Scintilla/"
       }
    },
-   "version" : "0.21_03"
+   "version" : "0.21_04"
 }

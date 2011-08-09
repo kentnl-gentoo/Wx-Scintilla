@@ -5,10 +5,13 @@ use warnings;
 use Wx;
 use Carp;
 
-our $VERSION = '0.21_03';
+our $VERSION = '0.21_04';
 
 # Define Perl 6 lexer
-use constant wxSCINTILLA_LEX_PERL6 => 98;
+use constant wxSCINTILLA_LEX_PERL6  => 102;
+use constant wxSCINTILLA_P6_DEFAULT => 0;
+use constant wxSCINTILLA_P6_COMMENT => 1;
+use constant wxSCINTILLA_P6_STRING  => 2;
 
 # check for loaded Wx::STC
 if ( exists( $INC{'Wx/STC.pm'} ) ) {
@@ -25,11 +28,11 @@ XSLoader::load 'Wx::Scintilla', $VERSION;
 no strict;
 
 package Wx::ScintillaTextCtrl;
-our $VERSION = '0.21_03';
+our $VERSION = '0.21_04';
 @ISA = qw(Wx::Control);
 
 package Wx::ScintillaTextEvent;
-our $VERSION = '0.21_03';
+our $VERSION = '0.21_04';
 @ISA = qw(Wx::CommandEvent);
 
 #Defeat the indexer by splitting the package declaration on two lines

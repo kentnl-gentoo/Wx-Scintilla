@@ -160,6 +160,7 @@ wx-scintilla/src/scintilla/src/LexOthers.cxx
 wx-scintilla/src/scintilla/src/LexPascal.cxx
 wx-scintilla/src/scintilla/src/LexPB.cxx
 wx-scintilla/src/scintilla/src/LexPerl.cxx
+wx-scintilla/src/scintilla/src/LexPerl6.cxx
 wx-scintilla/src/scintilla/src/LexPLM.cxx
 wx-scintilla/src/scintilla/src/LexPOV.cxx
 wx-scintilla/src/scintilla/src/LexPowerPro.cxx
