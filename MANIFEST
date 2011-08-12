@@ -49,6 +49,7 @@ share/doc/varwrap.pod
 share/doc/whitespace.pod
 share/doc/zooming.pod
 share/editor.pl
+share/perl-test-interpolation.pl
 share/perl6_editor.pl
 t/01_load.t
 t/02_inheritance.t
