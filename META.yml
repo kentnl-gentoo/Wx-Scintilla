@@ -19,15 +19,15 @@ name: Wx-Scintilla
 provides:
   Wx::Scintilla:
     file: lib/Wx/Scintilla.pm
-    version: 0.22
+    version: 0.23_01
   Wx::ScintillaTextCtrl:
     file: lib/Wx/Scintilla.pm
-    version: 0.22
+    version: 0.23_01
   Wx::ScintillaTextEvent:
     file: lib/Wx/Scintilla.pm
-    version: 0.22
+    version: 0.23_01
 resources:
   homepage: http://padre.perlide.org/
   license: http://dev.perl.org/licenses/
   repository: http://svn.perlide.org/padre/trunk/Wx-Scintilla/
-version: 0.22
+version: 0.23_01
