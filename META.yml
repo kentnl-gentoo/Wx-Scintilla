@@ -4,7 +4,7 @@ author:
   - 'Ahmad M. Zawawi <ahmad.zawawi@gmail.com>'
 build_requires:
   Alien::wxWidgets: 0
-  ExtUtils::XSpp: 0
+  ExtUtils::XSpp: 0.1602
   Test::More: 0
   Wx: 0
 configure_requires:
@@ -19,15 +19,15 @@ name: Wx-Scintilla
 provides:
   Wx::Scintilla:
     file: lib/Wx/Scintilla.pm
-    version: 0.25_03
+    version: 0.26
   Wx::ScintillaTextCtrl:
     file: lib/Wx/Scintilla.pm
-    version: 0.25_03
+    version: 0.26
   Wx::ScintillaTextEvent:
     file: lib/Wx/Scintilla.pm
-    version: 0.25_03
+    version: 0.26
 resources:
   homepage: http://padre.perlide.org/
   license: http://dev.perl.org/licenses/
   repository: http://svn.perlide.org/padre/trunk/Wx-Scintilla/
-version: 0.25_03
+version: 0.26
