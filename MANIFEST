@@ -21,6 +21,7 @@ t/01_load.t
 t/02_inheritance.t
 t/03_editor.t
 t/lib/Tests_Helper.pm
+ticket_1341.patch
 typemap
 wx-scintilla/include/private.h
 wx-scintilla/include/WxScintilla.h
