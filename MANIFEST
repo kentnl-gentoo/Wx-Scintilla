@@ -14,6 +14,7 @@ META.yml
 README
 Scintilla.xs
 Scintilla_README
+share/parse_wx_scintilla_h.pl
 share/perl-test-interpolation.pl.txt
 share/perl6_editor.pl
 share/perl_editor.pl
