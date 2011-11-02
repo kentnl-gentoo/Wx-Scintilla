@@ -13,6 +13,13 @@
       "version" : "2"
    },
    "name" : "Wx-Scintilla",
+   "no_index" : {
+      "directory" : [
+         "tools",
+         "wx-scintilla",
+         "cpp"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
@@ -24,25 +31,43 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.36"
+            "Module::Build" : "0.36",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008"
          }
       }
    },
    "provides" : {
       "Wx::Scintilla" : {
          "file" : "lib/Wx/Scintilla.pm",
-         "version" : "0.32"
+         "version" : "0.33_01"
+      },
+      "Wx::Scintilla::Constant" : {
+         "file" : "lib/Wx/Scintilla/Constant.pm",
+         "version" : "0.33_01"
+      },
+      "Wx::Scintilla::TextCtrl" : {
+         "file" : "lib/Wx/Scintilla/TextCtrl.pm",
+         "version" : "0.33_01"
+      },
+      "Wx::Scintilla::TextEvent" : {
+         "file" : "lib/Wx/Scintilla/TextEvent.pm",
+         "version" : "0.33_01"
       },
       "Wx::ScintillaTextCtrl" : {
          "file" : "lib/Wx/Scintilla.pm",
-         "version" : "0.32"
+         "version" : "0.33_01"
       },
       "Wx::ScintillaTextEvent" : {
          "file" : "lib/Wx/Scintilla.pm",
-         "version" : "0.32"
+         "version" : "0.33_01"
       }
    },
-   "release_status" : "stable",
+   "release_status" : "testing",
    "resources" : {
       "homepage" : "http://padre.perlide.org/",
       "license" : [
@@ -52,5 +77,5 @@
          "url" : "http://svn.perlide.org/padre/trunk/Wx-Scintilla/"
       }
    },
-   "version" : "0.32"
+   "version" : "0.33_01"
 }

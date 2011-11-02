@@ -7,22 +7,25 @@ inc/Module/Build/Scintilla/MSW.pm
 inc/Module/Build/Scintilla/MSWgcc.pm
 inc/Module/Build/Scintilla/OSX.pm
 lib/Wx/Scintilla.pm
+lib/Wx/Scintilla/Constant.pm
 lib/Wx/Scintilla/Manual.pod
+lib/Wx/Scintilla/TextCtrl.pm
+lib/Wx/Scintilla/TextEvent.pm
 MANIFEST			This list of files
-META.json
-META.yml
 README
 Scintilla.xs
 Scintilla_README
-share/parse_wx_scintilla_h.pl
-share/perl-test-interpolation.pl.txt
-share/perl6_editor.pl
-share/perl_editor.pl
 t/01_load.t
 t/02_inheritance.t
 t/03_editor.t
+t/03_editor_child.t
 t/lib/Tests_Helper.pm
 ticket_1341.patch
+tools/gen_scintilla_constants.pl
+tools/perl-test-interpolation.pl.txt
+tools/perl6_editor.pl
+tools/perl_editor.pl
+tools/perltidyrc
 typemap
 wx-scintilla/include/private.h
 wx-scintilla/include/WxScintilla.h
@@ -33,6 +36,7 @@ wx-scintilla/src/scintilla/include/ILexer.h
 wx-scintilla/src/scintilla/include/Platform.h
 wx-scintilla/src/scintilla/include/SciLexer.h
 wx-scintilla/src/scintilla/include/Scintilla.h
+wx-scintilla/src/scintilla/include/Scintilla.iface
 wx-scintilla/src/scintilla/include/ScintillaWidget.h
 wx-scintilla/src/scintilla/License.txt
 wx-scintilla/src/scintilla/README.txt
@@ -104,7 +108,6 @@ wx-scintilla/src/scintilla/src/LexFlagship.cxx
 wx-scintilla/src/scintilla/src/LexForth.cxx
 wx-scintilla/src/scintilla/src/LexFortran.cxx
 wx-scintilla/src/scintilla/src/LexGAP.cxx
-wx-scintilla/src/scintilla/src/LexGen.py
 wx-scintilla/src/scintilla/src/LexGui4Cli.cxx
 wx-scintilla/src/scintilla/src/LexHaskell.cxx
 wx-scintilla/src/scintilla/src/LexHTML.cxx
@@ -201,3 +204,5 @@ wx_typemap
 wx_typemap.xsp
 XS/ScintillaTextCtrl.xsp
 XS/ScintillaTextEvent.xsp
+META.yml
+META.json
