@@ -25,26 +25,26 @@ no_index:
 provides:
   Wx::Scintilla:
     file: lib/Wx/Scintilla.pm
-    version: 0.35_02
+    version: 0.35_03
   Wx::Scintilla::Constant:
     file: lib/Wx/Scintilla/Constant.pm
-    version: 0.35_02
+    version: 0.35_03
   Wx::Scintilla::TextCtrl:
     file: lib/Wx/Scintilla/TextCtrl.pm
-    version: 0.35_02
+    version: 0.35_03
   Wx::Scintilla::TextEvent:
     file: lib/Wx/Scintilla/TextEvent.pm
-    version: 0.35_02
+    version: 0.35_03
   Wx::ScintillaTextCtrl:
     file: lib/Wx/Scintilla.pm
-    version: 0.35_02
+    version: 0.35_03
   Wx::ScintillaTextEvent:
     file: lib/Wx/Scintilla.pm
-    version: 0.35_02
+    version: 0.35_03
 requires:
   perl: 5.008
 resources:
   homepage: http://padre.perlide.org/
   license: http://dev.perl.org/licenses/
   repository: http://svn.perlide.org/padre/trunk/Wx-Scintilla/
-version: 0.35_02
+version: 0.35_03

@@ -12,8 +12,6 @@ lib/Wx/Scintilla/Manual.pod
 lib/Wx/Scintilla/TextCtrl.pm
 lib/Wx/Scintilla/TextEvent.pm
 MANIFEST			This list of files
-META.json
-META.yml
 README
 Scintilla.xs
 Scintilla_README
@@ -206,3 +204,5 @@ wx_typemap
 wx_typemap.xsp
 XS/ScintillaTextCtrl.xsp
 XS/ScintillaTextEvent.xsp
+META.yml
+META.json
