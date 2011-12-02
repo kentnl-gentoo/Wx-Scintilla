@@ -48,7 +48,6 @@ sub stc_build_scintilla_object {
 		$self->stc_defines,
 		'-c -fPIC',
 		'-o ' . $object_name,
-		'-O2',
 		'-Wall',
 		$object_name !~ /((Plat|Scintilla)WX|scintilla)\.o/
 		? '-Wno-missing-braces -Wno-char-subscripts'
@@ -143,7 +142,7 @@ sub stc_link_xs {
 		Alien::wxWidgets->link_flags,
 		$Config{lddlflags},
 		'-fPIC -L.',
-		'-s -o ' . $dll,
+		'-o ' . $dll,
 		'Scintilla.o',
 		'-Lblib/arch/auto/Wx/Scintilla ' . $self->stc_scintilla_link,
 		Alien::wxWidgets->libraries(qw(core base)),
