@@ -89,6 +89,7 @@ wx-scintilla/src/scintilla/src/LexCaml.cxx
 wx-scintilla/src/scintilla/src/LexCLW.cxx
 wx-scintilla/src/scintilla/src/LexCmake.cxx
 wx-scintilla/src/scintilla/src/LexCOBOL.cxx
+wx-scintilla/src/scintilla/src/LexCoffeeScript.cxx
 wx-scintilla/src/scintilla/src/LexConf.cxx
 wx-scintilla/src/scintilla/src/LexCPP.cxx
 wx-scintilla/src/scintilla/src/LexCrontab.cxx
