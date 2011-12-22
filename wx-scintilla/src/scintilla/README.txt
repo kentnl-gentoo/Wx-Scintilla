@@ -1,7 +1,20 @@
-This directory contains copies of the scintilla/src and
-scintilla/include directories from the Scintilla source distribution.
-All other code needed to implement Scintilla on top of wxWidgets is
-located in the directory above this one.
+This folder contains copies of the scintilla/src, scintilla/lexers and 
+scintilla/include folders from the Scintilla source distribution. 
 
-The current version of the Scintilla code is 2.28
+The source distribution is located in 
+http://prdownloads.sourceforge.net/scintilla/scite302.zip?download
 
+Please note that 'scintilla/lexers' is currently copied into the
+scintilla/src folder.
+
+Unneeded *.py was removed. Why? We love Python :) Unneeded *.properties 
+files are also removed.
+
+We also have the experimental LexPerl6.cxx and a modified
+scintilla/src/SciLexer.h to include the Perl 6 syntax highlighter
+(i.e. lexer). Once it is stable, we will push it upstream again. 
+
+wxWidgets-specific code to embed Scintilla as a wxWidgets editor component
+is located in the parent folder.
+
+The current version of the Scintilla code is 3.0.2.
