@@ -12,8 +12,6 @@ lib/Wx/Scintilla/Manual.pod
 lib/Wx/Scintilla/TextCtrl.pm
 lib/Wx/Scintilla/TextEvent.pm
 MANIFEST			This list of files
-META.json
-META.yml
 README
 Scintilla.xs
 Scintilla_README
@@ -81,6 +79,7 @@ wx-scintilla/src/scintilla/src/LexAsn1.cxx
 wx-scintilla/src/scintilla/src/LexASY.cxx
 wx-scintilla/src/scintilla/src/LexAU3.cxx
 wx-scintilla/src/scintilla/src/LexAVE.cxx
+wx-scintilla/src/scintilla/src/LexAVS.cxx
 wx-scintilla/src/scintilla/src/LexBaan.cxx
 wx-scintilla/src/scintilla/src/LexBash.cxx
 wx-scintilla/src/scintilla/src/LexBasic.cxx
@@ -157,6 +156,7 @@ wx-scintilla/src/scintilla/src/LexTACL.cxx
 wx-scintilla/src/scintilla/src/LexTADS3.cxx
 wx-scintilla/src/scintilla/src/LexTAL.cxx
 wx-scintilla/src/scintilla/src/LexTCL.cxx
+wx-scintilla/src/scintilla/src/LexTCMD.cxx
 wx-scintilla/src/scintilla/src/LexTeX.cxx
 wx-scintilla/src/scintilla/src/LexTxt2tags.cxx
 wx-scintilla/src/scintilla/src/LexVB.cxx
@@ -207,3 +207,5 @@ wx_typemap
 wx_typemap.xsp
 XS/ScintillaTextCtrl.xsp
 XS/ScintillaTextEvent.xsp
+META.yml
+META.json

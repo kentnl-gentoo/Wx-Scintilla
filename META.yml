@@ -1,5 +1,5 @@
 ---
-abstract: 'Scintilla source code editing component for wxWidgets'
+abstract: 'Scintilla source code editing for wxWidgets'
 author:
   - 'Ahmad M. Zawawi <ahmad.zawawi@gmail.com>'
 build_requires:
@@ -25,26 +25,26 @@ no_index:
 provides:
   Wx::Scintilla:
     file: lib/Wx/Scintilla.pm
-    version: 0.37_03
+    version: 0.37_04
   Wx::Scintilla::Constant:
     file: lib/Wx/Scintilla/Constant.pm
-    version: 0.37_03
+    version: 0.37_04
   Wx::Scintilla::TextCtrl:
     file: lib/Wx/Scintilla/TextCtrl.pm
-    version: 0.37_03
+    version: 0.37_04
   Wx::Scintilla::TextEvent:
     file: lib/Wx/Scintilla/TextEvent.pm
-    version: 0.37_03
+    version: 0.37_04
   Wx::ScintillaTextCtrl:
     file: lib/Wx/Scintilla.pm
-    version: 0.37_03
+    version: 0.37_04
   Wx::ScintillaTextEvent:
     file: lib/Wx/Scintilla.pm
-    version: 0.37_03
+    version: 0.37_04
 requires:
   perl: 5.008
 resources:
   homepage: http://padre.perlide.org/
   license: http://dev.perl.org/licenses/
   repository: http://svn.perlide.org/padre/trunk/Wx-Scintilla/
-version: 0.37_03
+version: 0.37_04
