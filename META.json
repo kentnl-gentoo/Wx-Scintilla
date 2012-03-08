@@ -4,7 +4,7 @@
       "Ahmad M. Zawawi <ahmad.zawawi@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.3901, CPAN::Meta::Converter version 2.112621",
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
    "license" : [
       "perl_5"
    ],
@@ -17,7 +17,8 @@
       "directory" : [
          "tools",
          "wx-scintilla",
-         "cpp"
+         "cpp",
+         "inc"
       ]
    },
    "prereqs" : {
@@ -44,27 +45,27 @@
    "provides" : {
       "Wx::Scintilla" : {
          "file" : "lib/Wx/Scintilla.pm",
-         "version" : "0.37_04"
+         "version" : "0.37_05"
       },
       "Wx::Scintilla::Constant" : {
          "file" : "lib/Wx/Scintilla/Constant.pm",
-         "version" : "0.37_04"
+         "version" : "0.37_05"
       },
       "Wx::Scintilla::TextCtrl" : {
          "file" : "lib/Wx/Scintilla/TextCtrl.pm",
-         "version" : "0.37_04"
+         "version" : "0.37_05"
       },
       "Wx::Scintilla::TextEvent" : {
          "file" : "lib/Wx/Scintilla/TextEvent.pm",
-         "version" : "0.37_04"
+         "version" : "0.37_05"
       },
       "Wx::ScintillaTextCtrl" : {
          "file" : "lib/Wx/Scintilla.pm",
-         "version" : "0.37_04"
+         "version" : "0.37_05"
       },
       "Wx::ScintillaTextEvent" : {
          "file" : "lib/Wx/Scintilla.pm",
-         "version" : "0.37_04"
+         "version" : "0.37_05"
       }
    },
    "release_status" : "testing",
@@ -77,5 +78,5 @@
          "url" : "http://svn.perlide.org/padre/trunk/Wx-Scintilla/"
       }
    },
-   "version" : "0.37_04"
+   "version" : "0.37_05"
 }

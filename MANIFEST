@@ -95,6 +95,7 @@ wx-scintilla/src/scintilla/src/LexCrontab.cxx
 wx-scintilla/src/scintilla/src/LexCsound.cxx
 wx-scintilla/src/scintilla/src/LexCSS.cxx
 wx-scintilla/src/scintilla/src/LexD.cxx
+wx-scintilla/src/scintilla/src/LexECL.cxx
 wx-scintilla/src/scintilla/src/LexEiffel.cxx
 wx-scintilla/src/scintilla/src/LexerBase.cxx
 wx-scintilla/src/scintilla/src/LexerBase.h
