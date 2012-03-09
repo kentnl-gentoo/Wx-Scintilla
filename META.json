@@ -45,27 +45,27 @@
    "provides" : {
       "Wx::Scintilla" : {
          "file" : "lib/Wx/Scintilla.pm",
-         "version" : "0.37_05"
+         "version" : "0.37_06"
       },
       "Wx::Scintilla::Constant" : {
          "file" : "lib/Wx/Scintilla/Constant.pm",
-         "version" : "0.37_05"
+         "version" : "0.37_06"
       },
       "Wx::Scintilla::TextCtrl" : {
          "file" : "lib/Wx/Scintilla/TextCtrl.pm",
-         "version" : "0.37_05"
+         "version" : "0.37_06"
       },
       "Wx::Scintilla::TextEvent" : {
          "file" : "lib/Wx/Scintilla/TextEvent.pm",
-         "version" : "0.37_05"
+         "version" : "0.37_06"
       },
       "Wx::ScintillaTextCtrl" : {
          "file" : "lib/Wx/Scintilla.pm",
-         "version" : "0.37_05"
+         "version" : "0.37_06"
       },
       "Wx::ScintillaTextEvent" : {
          "file" : "lib/Wx/Scintilla.pm",
-         "version" : "0.37_05"
+         "version" : "0.37_06"
       }
    },
    "release_status" : "testing",
@@ -78,5 +78,5 @@
          "url" : "http://svn.perlide.org/padre/trunk/Wx-Scintilla/"
       }
    },
-   "version" : "0.37_05"
+   "version" : "0.37_06"
 }
