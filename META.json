@@ -4,7 +4,7 @@
       "Ahmad M. Zawawi <ahmad.zawawi@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.112150",
    "license" : [
       "perl_5"
    ],
@@ -45,27 +45,27 @@
    "provides" : {
       "Wx::Scintilla" : {
          "file" : "lib/Wx/Scintilla.pm",
-         "version" : "0.38"
+         "version" : "0.3801"
       },
       "Wx::Scintilla::Constant" : {
          "file" : "lib/Wx/Scintilla/Constant.pm",
-         "version" : "0.38"
+         "version" : "0.3801"
       },
       "Wx::Scintilla::TextCtrl" : {
          "file" : "lib/Wx/Scintilla/TextCtrl.pm",
-         "version" : "0.38"
+         "version" : "0.3801"
       },
       "Wx::Scintilla::TextEvent" : {
          "file" : "lib/Wx/Scintilla/TextEvent.pm",
-         "version" : "0.38"
+         "version" : "0.3801"
       },
       "Wx::ScintillaTextCtrl" : {
          "file" : "lib/Wx/Scintilla.pm",
-         "version" : "0.38"
+         "version" : "0.3801"
       },
       "Wx::ScintillaTextEvent" : {
          "file" : "lib/Wx/Scintilla.pm",
-         "version" : "0.38"
+         "version" : "0.3801"
       }
    },
    "release_status" : "stable",
@@ -78,5 +78,5 @@
          "url" : "http://svn.perlide.org/padre/trunk/Wx-Scintilla/"
       }
    },
-   "version" : "0.38"
+   "version" : "0.3801"
 }

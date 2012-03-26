@@ -20,7 +20,6 @@ t/02_inheritance.t
 t/03_editor.t
 t/03_editor_child.t
 t/lib/Tests_Helper.pm
-ticket_1341.patch
 tools/gen_scintilla_constants.pl
 tools/perl-test-interpolation.pl.txt
 tools/perl6_editor.pl
