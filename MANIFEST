@@ -130,6 +130,7 @@ wx-scintilla/src/scintilla/src/LexMySQL.cxx
 wx-scintilla/src/scintilla/src/LexNimrod.cxx
 wx-scintilla/src/scintilla/src/LexNsis.cxx
 wx-scintilla/src/scintilla/src/LexOpal.cxx
+wx-scintilla/src/scintilla/src/LexOScript.cxx
 wx-scintilla/src/scintilla/src/LexOthers.cxx
 wx-scintilla/src/scintilla/src/LexPascal.cxx
 wx-scintilla/src/scintilla/src/LexPB.cxx
@@ -162,6 +163,7 @@ wx-scintilla/src/scintilla/src/LexTxt2tags.cxx
 wx-scintilla/src/scintilla/src/LexVB.cxx
 wx-scintilla/src/scintilla/src/LexVerilog.cxx
 wx-scintilla/src/scintilla/src/LexVHDL.cxx
+wx-scintilla/src/scintilla/src/LexVisualProlog.cxx
 wx-scintilla/src/scintilla/src/LexYAML.cxx
 wx-scintilla/src/scintilla/src/LineMarker.cxx
 wx-scintilla/src/scintilla/src/LineMarker.h
