@@ -98,7 +98,7 @@ sub stc_build_xs {
 		' /c /FoScintilla.obj',
 		'-I.',
 		'-I' . $self->stc_get_wx_include_path,
-		'-I' . $Config{archlib} . '/CORE',
+		'-I' . $Config{archlibexp} . '/CORE',
 		Alien::wxWidgets->include_path,
 		Alien::wxWidgets->c_flags,
 		Alien::wxWidgets->defines,
@@ -141,7 +141,8 @@ sub stc_link_xs {
 		$perllib,
 		Alien::wxWidgets->libraries(qw(core base)),
 		'/LIBPATH:"' . Alien::wxWidgets->shared_library_path . '"',
-		$Config{perllibs}
+		$Config{perllibs},
+		'-def:Scintilla.def',
 	);
 
 	$self->_run_command( \@cmd );
